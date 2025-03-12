@@ -8,25 +8,31 @@ from reportlab.pdfgen import canvas
 st.set_page_config(page_title="PDF & File Converter", layout="wide")
 
 # Load Custom CSS
-def local_css(file_name):
-    with open(file_name) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+def local_css():
+    st.markdown("""
+        <style>
+            .small-text { font-size: 12px; text-align: center; margin-top: 20px; color: #888; }
+        </style>
+    """, unsafe_allow_html=True)
 
-local_css("assets/Style.css")
+local_css()
 
-# Title
+# ✅ Add Logo at the Top
+st.image("logo1.png", width=150)
+
 st.title("📄 PDF, Image & Word Converter Tool")
 
 # --- First, Show Main Options ---
 operation = st.selectbox("Select an operation:", [
     "Generate Empty PDF",
     "Convert Images to PDF",
+    "Convert TXT to PDF",
     "Extract Pages from PDF",
     "Merge PDFs",
     "Split PDF"
 ])
 
-# --- Generate Empty PDF ---
+# ✅ Generate Empty PDF
 if operation == "Generate Empty PDF":
     st.subheader("📝 Create an Empty PDF")
     num_pages = st.number_input("Enter number of pages:", min_value=1, step=1)
@@ -42,7 +48,7 @@ if operation == "Generate Empty PDF":
         st.download_button("💚 Download Empty PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
 # --- Upload File Section ---
-uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx"])
+uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx", "txt"])
 
 if uploaded_file:
     file_bytes = BytesIO(uploaded_file.getbuffer())
@@ -60,6 +66,22 @@ if uploaded_file:
             pdf_bytes.seek(0)
             file_name = st.text_input("Enter output file name:", value="Images_to_PDF")
             st.download_button("💚 Download PDF", data=pdf_bytes, file_name=f"{file_name}.pdf", mime="application/pdf")
+
+    # ✅ Convert TXT to PDF
+    elif operation == "Convert TXT to PDF" and uploaded_file.type == "text/plain":
+        st.subheader("📄 Convert TXT File to PDF")
+        text_content = uploaded_file.read().decode("utf-8")
+        output_pdf = BytesIO()
+        pdf_canvas = canvas.Canvas(output_pdf)
+        pdf_canvas.setFont("Helvetica", 12)
+        y_position = 750
+        for line in text_content.split("\n"):
+            pdf_canvas.drawString(50, y_position, line)
+            y_position -= 20
+        pdf_canvas.save()
+        output_pdf.seek(0)
+        file_name = st.text_input("Enter output file name:", value="Converted_TXT")
+        st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
     # ✅ Extract Pages from PDF
     elif operation == "Extract Pages from PDF" and uploaded_file.type == "application/pdf":
@@ -122,24 +144,7 @@ if uploaded_file:
             except ValueError:
                 st.error("Invalid page numbers! Please enter valid numbers.")
 
-# --- Apply Button Styling ---
-st.markdown("""
-    <style>
-        div[data-testid="stButton"] button {
-            background-color: red;
-            color: white;
-            font-size: 16px;
-            width: 100%;
-        }
-        div[data-testid="stDownloadButton"] button {
-            background-color: green;
-            color: white;
-            font-size: 16px;
-            width: 100%;
-        }
-    </style>
-""", unsafe_allow_html=True)
-# Add Copyright Text at Bottom
+# ✅ Copyright Text at Bottom
 st.markdown(
     '<p class="small-text">© Content Owners: Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | '
     'Bhuvaneswari Devi Seru | Chandu Meela</p>',
