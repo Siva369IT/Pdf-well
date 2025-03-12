@@ -16,6 +16,21 @@ local_css("assets/Style.css")
 
 st.title("📄 PDF, Image & Word Converter Tool")
 
+# ✅ Generate Empty PDF (Now First in UI)
+st.subheader("📝 Create an Empty PDF")
+num_pages = st.number_input("Enter number of pages:", min_value=1, step=1)
+if st.button("Generate Empty PDF"):
+    output_pdf = BytesIO()
+    pdf_canvas = canvas.Canvas(output_pdf)
+    for i in range(num_pages):
+        pdf_canvas.drawString(100, 750, f"Page {i+1}")
+        pdf_canvas.showPage()
+    pdf_canvas.save()
+    output_pdf.seek(0)
+    file_name = st.text_input("Enter output file name:", value="Empty_PDF")
+    st.download_button("Download Empty PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+
+st.subheader("📂 Upload Files for Conversion")
 uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx"], accept_multiple_files=False)
 
 # ✅ Multiple Images to Single PDF
@@ -24,11 +39,10 @@ uploaded_images = st.file_uploader("Upload multiple images", accept_multiple_fil
 if uploaded_images:
     pdf_bytes = BytesIO()
     image_list = [Image.open(img).convert("RGB") for img in uploaded_images]
-
-    # Save all images to a single PDF
+    
     first_image = image_list[0]
     first_image.save(pdf_bytes, format="PDF", save_all=True, append_images=image_list[1:])
-
+    
     pdf_bytes.seek(0)
     file_name = st.text_input("Enter output file name:", value="Images_to_PDF")
     st.download_button("Download PDF", data=pdf_bytes, file_name=f"{file_name}.pdf", mime="application/pdf")
@@ -82,16 +96,3 @@ if uploaded_file:
             output_pdf.seek(0)
             file_name = st.text_input("Enter output file name:", value="Split_File")
             st.download_button("Download Split PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
-
-    # ✅ Generate Empty PDF
-    if st.button("Generate Empty PDF"):
-        num_pages = st.number_input("Enter number of pages:", min_value=1, step=1)
-        output_pdf = BytesIO()
-        pdf_canvas = canvas.Canvas(output_pdf)
-        for i in range(num_pages):
-            pdf_canvas.drawString(100, 750, f"Page {i+1}")
-            pdf_canvas.showPage()
-        pdf_canvas.save()
-        output_pdf.seek(0)
-        file_name = st.text_input("Enter output file name:", value="Empty_PDF")
-        st.download_button("Download Empty PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
