@@ -6,7 +6,13 @@ from docx import Document
 from reportlab.pdfgen import canvas
 
 st.set_page_config(page_title="PDF & File Converter", layout="wide")
+import streamlit as st
 
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+local_css("assets/Style.css")
 st.title("📄 PDF, Image & Word Converter Tool")
 
 uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx"])
