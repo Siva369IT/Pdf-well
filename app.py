@@ -16,29 +16,29 @@ local_css("assets/Style.css")
 
 st.title("📄 PDF, Image & Word Converter Tool")
 
-uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx"])
+uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx"], accept_multiple_files=False)
+
+# ✅ Multiple Images to Single PDF
+uploaded_images = st.file_uploader("Upload multiple images", accept_multiple_files=True, type=["png", "jpg", "jpeg"])
+
+if uploaded_images:
+    pdf_bytes = BytesIO()
+    image_list = [Image.open(img).convert("RGB") for img in uploaded_images]
+
+    # Save all images to a single PDF
+    first_image = image_list[0]
+    first_image.save(pdf_bytes, format="PDF", save_all=True, append_images=image_list[1:])
+
+    pdf_bytes.seek(0)
+    file_name = st.text_input("Enter output file name:", value="Images_to_PDF")
+    st.download_button("Download PDF", data=pdf_bytes, file_name=f"{file_name}.pdf", mime="application/pdf")
 
 if uploaded_file:
     file_bytes = BytesIO(uploaded_file.getbuffer())
     st.success(f"Uploaded {uploaded_file.name} successfully!")
 
-    # ✅ Multiple Images to PDF
-    if uploaded_file.type.startswith("image"):
-        uploaded_images = st.file_uploader("Upload multiple images", accept_multiple_files=True, type=["png", "jpg", "jpeg"])
-
-        if uploaded_images:
-            pdf_bytes = BytesIO()
-            first_image = Image.open(uploaded_images[0])
-            image_list = [Image.open(img) for img in uploaded_images[1:]]
-
-            first_image.save(pdf_bytes, "PDF", resolution=100.0, save_all=True, append_images=image_list)
-
-            pdf_bytes.seek(0)
-            file_name = st.text_input("Enter output file name:", value="Images_to_PDF")
-            st.download_button("Download PDF", data=pdf_bytes, file_name=f"{file_name}.pdf", mime="application/pdf")
-
     # ✅ Extract Pages from PDF
-    elif uploaded_file.type == "application/pdf":
+    if uploaded_file.type == "application/pdf":
         reader = PdfReader(file_bytes)
         total_pages = len(reader.pages)
         st.write(f"Total pages: {total_pages}")
