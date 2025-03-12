@@ -139,3 +139,9 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+# Add Copyright Text at Bottom
+st.markdown(
+    '<p class="small-text">© Content Owners: Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | '
+    'Bhuvaneswari Devi Seru | Chandu Meela</p>',
+    unsafe_allow_html=True
+)
