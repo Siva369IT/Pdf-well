@@ -10,7 +10,7 @@ from PIL import Image
 st.set_page_config(page_title="PDF Well", page_icon="💚", layout="wide")
 
 # Load custom CSS
-with open("assets/style.css", "r") as css_file:
+with open("assets/Style.css", "r") as css_file:
     st.markdown(f"<style>{css_file.read()}</style>", unsafe_allow_html=True)
 
 # Title
