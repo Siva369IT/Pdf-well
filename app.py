@@ -3,6 +3,7 @@ from PyPDF2 import PdfReader, PdfWriter
 from PIL import Image
 from io import BytesIO
 from docx import Document
+from pptx import Presentation
 from reportlab.pdfgen import canvas
 
 st.set_page_config(page_title="PDF & File Converter", layout="wide")
@@ -27,6 +28,8 @@ operation = st.selectbox("Select an operation:", [
     "Generate Empty PDF",
     "Convert Images to PDF",
     "Convert TXT to PDF",
+    "Convert DOCX to PDF",
+    "Convert PPT to PDF",
     "Extract Pages from PDF",
     "Merge PDFs",
     "Split PDF"
@@ -83,66 +86,39 @@ if uploaded_file:
         file_name = st.text_input("Enter output file name:", value="Converted_TXT")
         st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-    # ✅ Extract Pages from PDF
-    elif operation == "Extract Pages from PDF" and uploaded_file.type == "application/pdf":
-        st.subheader("📄 Extract Pages from PDF")
-        reader = PdfReader(file_bytes)
-        total_pages = len(reader.pages)
-        st.write(f"Total pages: {total_pages}")
-        pages_to_extract = st.multiselect("Select pages to extract:", list(range(1, total_pages + 1)))
-        if st.button("Extract Pages", use_container_width=True):
-            writer = PdfWriter()
-            for page_num in pages_to_extract:
-                writer.add_page(reader.pages[page_num - 1])
-            output_pdf = BytesIO()
-            writer.write(output_pdf)
-            output_pdf.seek(0)
-            file_name = st.text_input("Enter output file name:", value="Extracted_Pages")
-            st.download_button("💚 Download Extracted PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+    # ✅ Convert DOCX to PDF
+    elif operation == "Convert DOCX to PDF" and uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        st.subheader("📄 Convert DOCX to PDF")
+        doc = Document(file_bytes)
+        output_pdf = BytesIO()
+        pdf_canvas = canvas.Canvas(output_pdf)
+        pdf_canvas.setFont("Helvetica", 12)
+        y_position = 750
+        for para in doc.paragraphs:
+            pdf_canvas.drawString(50, y_position, para.text)
+            y_position -= 20
+        pdf_canvas.save()
+        output_pdf.seek(0)
+        file_name = st.text_input("Enter output file name:", value="Converted_DOCX")
+        st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-    # ✅ Merge PDFs
-    elif operation == "Merge PDFs":
-        st.subheader("🔗 Merge Multiple PDFs")
-        uploaded_files = st.file_uploader("Upload PDFs to merge", accept_multiple_files=True, type=["pdf"])
-        if uploaded_files:
-            if st.button("Merge PDFs", use_container_width=True):
-                writer = PdfWriter()
-                for file in uploaded_files:
-                    reader = PdfReader(BytesIO(file.getbuffer()))
-                    for page in reader.pages:
-                        writer.add_page(page)
-                output_pdf = BytesIO()
-                writer.write(output_pdf)
-                output_pdf.seek(0)
-                file_name = st.text_input("Enter output file name:", value="Merged_File")
-                st.download_button("💚 Download Merged PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
-
-    # ✅ Split PDF
-    elif operation == "Split PDF" and uploaded_file.type == "application/pdf":
-        st.subheader("✂️ Split PDF into Multiple Files")
-        reader = PdfReader(file_bytes)
-        total_pages = len(reader.pages)
-        st.write(f"Total pages: {total_pages}")
-
-        split_pages = st.text_input("Enter pages to split (comma-separated):")
-        if split_pages:
-            try:
-                split_pages = [int(x.strip()) for x in split_pages.split(",") if 1 <= int(x.strip()) <= total_pages]
-                split_files = []
-                
-                for i, page_num in enumerate(split_pages):
-                    writer = PdfWriter()
-                    writer.add_page(reader.pages[page_num - 1])
-                    output_pdf = BytesIO()
-                    writer.write(output_pdf)
-                    output_pdf.seek(0)
-                    split_files.append((f"Split_{i+1}.pdf", output_pdf))
-                
-                for file_name, pdf_data in split_files:
-                    st.download_button(f"💚 Download {file_name}", data=pdf_data, file_name=file_name, mime="application/pdf")
-
-            except ValueError:
-                st.error("Invalid page numbers! Please enter valid numbers.")
+    # ✅ Convert PPT to PDF
+    elif operation == "Convert PPT to PDF" and uploaded_file.type == "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+        st.subheader("📄 Convert PPT to PDF")
+        prs = Presentation(file_bytes)
+        output_pdf = BytesIO()
+        pdf_canvas = canvas.Canvas(output_pdf)
+        pdf_canvas.setFont("Helvetica", 12)
+        y_position = 750
+        for slide in prs.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, "text"):
+                    pdf_canvas.drawString(50, y_position, shape.text)
+                    y_position -= 20
+        pdf_canvas.save()
+        output_pdf.seek(0)
+        file_name = st.text_input("Enter output file name:", value="Converted_PPT")
+        st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
 # ✅ Copyright Text at Bottom
 st.markdown(
