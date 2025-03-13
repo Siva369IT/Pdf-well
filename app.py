@@ -28,7 +28,7 @@ operation = st.selectbox("Select an operation:", [
     "Generate Empty PDF",
     "Convert Images to PDF",
     "Convert TXT to PDF",
-    "Convert MS Word (DOC/DOCX) to PDF",
+    "Convert MS Word (DOCX) to PDF",
     "Convert PPT to PDF",
     "Extract Pages from PDF",
     "Merge PDFs",
@@ -51,7 +51,7 @@ if operation == "Generate Empty PDF":
         st.download_button("💚 Download Empty PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
 # --- Upload File Section ---
-uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "doc", "pptx", "txt"])
+uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx", "txt"])
 
 if uploaded_file:
     file_bytes = BytesIO(uploaded_file.getbuffer())
@@ -86,21 +86,30 @@ if uploaded_file:
         file_name = st.text_input("Enter output file name:", value="Converted_TXT")
         st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-    # ✅ Convert MS Word (DOC/DOCX) to PDF
-    elif operation == "Convert MS Word (DOC/DOCX) to PDF" and uploaded_file.type in ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword"]:
-        st.subheader("📄 Convert MS Word (DOC/DOCX) to PDF")
-        doc = Document(file_bytes)
-        output_pdf = BytesIO()
-        pdf_canvas = canvas.Canvas(output_pdf)
-        pdf_canvas.setFont("Helvetica", 12)
-        y_position = 750
-        for para in doc.paragraphs:
-            pdf_canvas.drawString(50, y_position, para.text)
-            y_position -= 20
-        pdf_canvas.save()
-        output_pdf.seek(0)
-        file_name = st.text_input("Enter output file name:", value="Converted_Word")
-        st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+    # ✅ Convert MS Word (DOCX) to PDF
+    elif operation == "Convert MS Word (DOCX) to PDF":
+        st.subheader("📄 Convert MS Word (DOCX) to PDF")
+
+        if uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            try:
+                doc = Document(file_bytes)
+                output_pdf = BytesIO()
+                pdf_canvas = canvas.Canvas(output_pdf)
+                pdf_canvas.setFont("Helvetica", 12)
+                y_position = 750
+                for para in doc.paragraphs:
+                    pdf_canvas.drawString(50, y_position, para.text)
+                    y_position -= 20
+                pdf_canvas.save()
+                output_pdf.seek(0)
+                file_name = st.text_input("Enter output file name:", value="Converted_Word")
+                st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+
+            except Exception as e:
+                st.error(f"❌ Error converting DOCX: {e}")
+
+        else:
+            st.error("❌ This file format is not supported. Please upload a valid DOCX file.")
 
     # ✅ Convert PPT to PDF
     elif operation == "Convert PPT to PDF" and uploaded_file.type == "application/vnd.openxmlformats-officedocument.presentationml.presentation":
