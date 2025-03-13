@@ -1,54 +1,46 @@
-body {
-    background-color: #f4f4f4;
-    font-family: 'Arial', sans-serif;
-}
-
-.title {
+/* Center the title */
+h1 {
     text-align: center;
-    font-size: 30px;
+    font-size: 32px;
     font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
+    color: #2c3e50;
 }
 
-.subheader {
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-    color: #555;
-}
-
-.small-text {
-    font-size: 12px;
-    text-align: center;
-    color: #888;
-    margin-top: 20px;
-}
-
+/* Styling for buttons */
 .stButton>button {
-    background-color: #FF5733;
+    background-color: #27ae60;
     color: white;
-    font-size: 16px;
     border-radius: 8px;
-    width: 100%;
+    font-size: 16px;
+    padding: 10px 20px;
+}
+
+/* Custom styling for file uploader */
+div[data-testid="stFileUploader"] {
+    border: 2px dashed #27ae60;
     padding: 10px;
-    transition: 0.3s;
+    border-radius: 10px;
 }
 
-.stButton>button:hover {
-    background-color: #D84315;
+/* Custom styling for dropdown */
+div[data-testid="stSelectbox"] {
+    border: 2px solid #27ae60;
+    border-radius: 10px;
 }
 
+/* Sidebar styling */
+section[data-testid="stSidebar"] {
+    background-color: #ecf0f1;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* Center download button */
 .stDownloadButton>button {
-    background-color: #28A745;
+    background-color: #e74c3c;
     color: white;
     font-size: 16px;
+    padding: 10px 20px;
     border-radius: 8px;
     width: 100%;
-    padding: 10px;
-    transition: 0.3s;
-}
-
-.stDownloadButton>button:hover {
-    background-color: #1E7E34;
 }
