@@ -28,7 +28,7 @@ operation = st.selectbox("Select an operation:", [
     "Generate Empty PDF",
     "Convert Images to PDF",
     "Convert TXT to PDF",
-    "Convert DOCX to PDF",
+    "Convert MS Word (DOC/DOCX) to PDF",
     "Convert PPT to PDF",
     "Extract Pages from PDF",
     "Merge PDFs",
@@ -51,7 +51,7 @@ if operation == "Generate Empty PDF":
         st.download_button("💚 Download Empty PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
 # --- Upload File Section ---
-uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx", "txt"])
+uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "doc", "pptx", "txt"])
 
 if uploaded_file:
     file_bytes = BytesIO(uploaded_file.getbuffer())
@@ -86,9 +86,9 @@ if uploaded_file:
         file_name = st.text_input("Enter output file name:", value="Converted_TXT")
         st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-    # ✅ Convert DOCX to PDF
-    elif operation == "Convert DOCX to PDF" and uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        st.subheader("📄 Convert DOCX to PDF")
+    # ✅ Convert MS Word (DOC/DOCX) to PDF
+    elif operation == "Convert MS Word (DOC/DOCX) to PDF" and uploaded_file.type in ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword"]:
+        st.subheader("📄 Convert MS Word (DOC/DOCX) to PDF")
         doc = Document(file_bytes)
         output_pdf = BytesIO()
         pdf_canvas = canvas.Canvas(output_pdf)
@@ -99,7 +99,7 @@ if uploaded_file:
             y_position -= 20
         pdf_canvas.save()
         output_pdf.seek(0)
-        file_name = st.text_input("Enter output file name:", value="Converted_DOCX")
+        file_name = st.text_input("Enter output file name:", value="Converted_Word")
         st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
     # ✅ Convert PPT to PDF
