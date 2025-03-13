@@ -1,118 +1,111 @@
 import streamlit as st
-from PyPDF2 import PdfMerger, PdfReader, PdfWriter
+import os
+from PyPDF2 import PdfReader, PdfWriter
 from docx import Document
 from pptx import Presentation
-import os
-import io
+from reportlab.pdfgen import canvas
+from PIL import Image
 
 # Set page config
-st.set_page_config(page_title="PDF, Image & Word Converter Tool", page_icon="📄", layout="wide")
+st.set_page_config(page_title="PDF Well", page_icon="💚", layout="wide")
 
 # Load custom CSS
 with open("assets/style.css", "r") as css_file:
     st.markdown(f"<style>{css_file.read()}</style>", unsafe_allow_html=True)
 
-# Title with logo
-col1, col2 = st.columns([1, 5])
-with col1:
-    st.image("logo1.png", width=100)
-with col2:
-    st.title("PDF, Image & Word Converter Tool")
+# Title
+st.title("PDF Well - All-in-One PDF Toolkit")
 
-# Sidebar for operations
-st.sidebar.header("Select an operation:")
-operation = st.sidebar.selectbox("Choose:", ["Generate Empty PDF", "Convert to PDF", "Merge PDFs", "Split PDFs", "Extract Pages"])
+# Sidebar
+st.sidebar.header("Choose an Action")
+option = st.sidebar.selectbox("Select an option:", ["Convert to PDF", "Extract Pages", "Merge PDFs", "Split PDF", "Create Empty PDF"])
 
-# Function to create an empty PDF
-def create_empty_pdf(pages):
-    output = PdfWriter()
-    for _ in range(pages):
-        output.add_blank_page(width=612, height=792)  # Standard A4 size
-    return output
+# File uploader
+uploaded_files = st.file_uploader("Upload your file(s)", accept_multiple_files=True)
 
-# Function to convert files to PDF
-def convert_to_pdf(uploaded_file):
-    file_extension = uploaded_file.name.split(".")[-1].lower()
-    pdf_writer = PdfWriter()
-    pdf_buffer = io.BytesIO()
-
-    if file_extension == "docx":
-        doc = Document(uploaded_file)
-        pdf_writer.add_blank_page()
-        pdf_writer.write(pdf_buffer)
-    elif file_extension in ["ppt", "pptx"]:
-        prs = Presentation(uploaded_file)
-        pdf_writer.add_blank_page()
-        pdf_writer.write(pdf_buffer)
-    else:
-        st.error("Unsupported file format!")
-        return None
-
-    return pdf_buffer.getvalue()
-
-# Operation: Generate Empty PDF
-if operation == "Generate Empty PDF":
-    st.subheader("📝 Create an Empty PDF")
-    pages = st.number_input("Enter number of pages:", min_value=1, value=1, step=1)
-    if st.button("Generate Empty PDF"):
-        pdf_output = create_empty_pdf(pages)
-        output_buffer = io.BytesIO()
-        pdf_output.write(output_buffer)
-        st.download_button("Download PDF", output_buffer.getvalue(), file_name="empty.pdf", mime="application/pdf")
-
-# Operation: Convert to PDF
-elif operation == "Convert to PDF":
-    st.subheader("📂 Convert Any File to PDF")
-    uploaded_file = st.file_uploader("Upload a file", type=["docx", "ppt", "pptx"])
-    if uploaded_file:
-        pdf_data = convert_to_pdf(uploaded_file)
-        if pdf_data:
-            st.download_button("Download PDF", pdf_data, file_name="converted.pdf", mime="application/pdf")
-
-# Operation: Merge PDFs
-elif operation == "Merge PDFs":
-    st.subheader("📑 Merge Multiple PDFs")
-    uploaded_files = st.file_uploader("Upload PDFs", type="pdf", accept_multiple_files=True)
+# Process the selected option
+if option == "Convert to PDF":
     if uploaded_files:
-        merger = PdfMerger()
-        for pdf in uploaded_files:
-            merger.append(PdfReader(pdf))
-        output_buffer = io.BytesIO()
-        merger.write(output_buffer)
-        st.download_button("Download Merged PDF", output_buffer.getvalue(), file_name="merged.pdf", mime="application/pdf")
+        for uploaded_file in uploaded_files:
+            file_extension = uploaded_file.name.split(".")[-1].lower()
+            
+            if file_extension in ["png", "jpg", "jpeg"]:
+                image = Image.open(uploaded_file)
+                pdf_path = f"{uploaded_file.name}.pdf"
+                image.convert("RGB").save(pdf_path)
+                st.download_button("Download PDF", data=open(pdf_path, "rb"), file_name=pdf_path, mime="application/pdf")
 
-# Operation: Split PDFs
-elif operation == "Split PDFs":
-    st.subheader("✂ Split a PDF")
-    uploaded_pdf = st.file_uploader("Upload a PDF to split", type="pdf")
-    if uploaded_pdf:
-        pdf_reader = PdfReader(uploaded_pdf)
-        total_pages = len(pdf_reader.pages)
-        start, end = st.slider("Select page range", 1, total_pages, (1, total_pages))
-        if st.button("Split PDF"):
-            pdf_writer = PdfWriter()
-            for i in range(start - 1, end):
-                pdf_writer.add_page(pdf_reader.pages[i])
-            output_buffer = io.BytesIO()
-            pdf_writer.write(output_buffer)
-            st.download_button("Download Split PDF", output_buffer.getvalue(), file_name="split.pdf", mime="application/pdf")
+            elif file_extension in ["docx", "doc"]:
+                doc = Document(uploaded_file)
+                pdf_path = f"{uploaded_file.name}.pdf"
+                pdf = canvas.Canvas(pdf_path)
+                for para in doc.paragraphs:
+                    pdf.drawString(100, 800, para.text)
+                pdf.save()
+                st.download_button("Download PDF", data=open(pdf_path, "rb"), file_name=pdf_path, mime="application/pdf")
 
-# Operation: Extract Pages
-elif operation == "Extract Pages":
-    st.subheader("🔍 Extract Specific Pages from PDF")
-    uploaded_pdf = st.file_uploader("Upload a PDF to extract pages", type="pdf")
-    if uploaded_pdf:
-        pdf_reader = PdfReader(uploaded_pdf)
-        total_pages = len(pdf_reader.pages)
-        pages = st.text_input(f"Enter pages (1-{total_pages}, comma-separated):")
-        if st.button("Extract Pages"):
-            selected_pages = [int(p) - 1 for p in pages.split(",") if p.isdigit() and 1 <= int(p) <= total_pages]
-            if selected_pages:
-                pdf_writer = PdfWriter()
-                for page in selected_pages:
-                    pdf_writer.add_page(pdf_reader.pages[page])
-                output_buffer = io.BytesIO()
-                pdf_writer.write(output_buffer)
-                st.download_button("Download Extracted PDF", output_buffer.getvalue(), file_name="extracted.pdf", mime="application/pdf")
+            elif file_extension in ["pptx", "ppt"]:
+                ppt = Presentation(uploaded_file)
+                pdf_path = f"{uploaded_file.name}.pdf"
+                pdf = canvas.Canvas(pdf_path)
+                for slide in ppt.slides:
+                    for shape in slide.shapes:
+                        if hasattr(shape, "text"):
+                            pdf.drawString(100, 800, shape.text)
+                pdf.save()
+                st.download_button("Download PDF", data=open(pdf_path, "rb"), file_name=pdf_path, mime="application/pdf")
+
             else:
-                st.error("Invalid page selection!")
+                st.error("Unsupported file format.")
+
+elif option == "Extract Pages":
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            pdf_reader = PdfReader(uploaded_file)
+            pages = st.text_input("Enter page numbers to extract (comma-separated, e.g., 1,3,5)").split(",")
+            if st.button("Extract"):
+                pdf_writer = PdfWriter()
+                for page_num in pages:
+                    try:
+                        pdf_writer.add_page(pdf_reader.pages[int(page_num) - 1])
+                    except IndexError:
+                        st.error(f"Page {page_num} does not exist.")
+                output_path = "extracted_pages.pdf"
+                with open(output_path, "wb") as out_file:
+                    pdf_writer.write(out_file)
+                st.download_button("Download Extracted PDF", data=open(output_path, "rb"), file_name="extracted_pages.pdf", mime="application/pdf")
+
+elif option == "Merge PDFs":
+    if len(uploaded_files) > 1:
+        pdf_writer = PdfWriter()
+        for uploaded_file in uploaded_files:
+            pdf_reader = PdfReader(uploaded_file)
+            for page in pdf_reader.pages:
+                pdf_writer.add_page(page)
+        output_path = "merged.pdf"
+        with open(output_path, "wb") as out_file:
+            pdf_writer.write(out_file)
+        st.download_button("Download Merged PDF", data=open(output_path, "rb"), file_name="merged.pdf", mime="application/pdf")
+
+elif option == "Split PDF":
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            pdf_reader = PdfReader(uploaded_file)
+            for i, page in enumerate(pdf_reader.pages):
+                pdf_writer = PdfWriter()
+                pdf_writer.add_page(page)
+                output_path = f"split_page_{i+1}.pdf"
+                with open(output_path, "wb") as out_file:
+                    pdf_writer.write(out_file)
+                st.download_button(f"Download Page {i+1}", data=open(output_path, "rb"), file_name=output_path, mime="application/pdf")
+
+elif option == "Create Empty PDF":
+    output_path = "empty.pdf"
+    pdf = canvas.Canvas(output_path)
+    for i in range(1, 6):  # 5 blank pages
+        pdf.showPage()
+    pdf.save()
+    st.download_button("Download Empty PDF", data=open(output_path, "rb"), file_name="empty.pdf", mime="application/pdf")
+
+# Copyright
+st.markdown("<small>© Pavan Sri Sai Mondem, Siva Satyamsetti, Uma Satyam Mounika Sapireddy, Bhuvaneswari Devi Seru, Chandu Meela</small>", unsafe_allow_html=True)
