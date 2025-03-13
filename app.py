@@ -8,28 +8,60 @@ from reportlab.pdfgen import canvas
 
 st.set_page_config(page_title="PDF & File Converter", layout="wide")
 
-# Load Custom CSS
-def local_css():
+# ✅ Apply Beautiful UI Styling
+def custom_css():
     st.markdown("""
         <style>
-            .small-text { font-size: 12px; text-align: center; margin-top: 20px; color: #888; }
+            body {
+                background-color: #f4f4f4;
+            }
+            .title {
+                text-align: center;
+                font-size: 30px;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 20px;
+            }
+            .subheader {
+                text-align: center;
+                font-size: 18px;
+                font-weight: bold;
+                color: #555;
+            }
+            .small-text {
+                font-size: 12px;
+                text-align: center;
+                color: #888;
+                margin-top: 20px;
+            }
+            .stButton>button {
+                background-color: #FF5733;
+                color: white;
+                font-size: 16px;
+                border-radius: 8px;
+                width: 100%;
+            }
+            .stDownloadButton>button {
+                background-color: #28A745;
+                color: white;
+                font-size: 16px;
+                border-radius: 8px;
+                width: 100%;
+            }
         </style>
     """, unsafe_allow_html=True)
 
-local_css()
+custom_css()
 
 # ✅ Add Logo at the Top
 st.image("logo1.png", width=150)
 
-st.title("📄 PDF, Image & Word Converter Tool")
+st.markdown('<p class="title">📄 PDF & File Converter</p>', unsafe_allow_html=True)
 
-# --- First, Show Main Options ---
+# --- Show Main Options ---
 operation = st.selectbox("Select an operation:", [
     "Generate Empty PDF",
-    "Convert Images to PDF",
-    "Convert TXT to PDF",
-    "Convert MS Word (DOCX) to PDF",
-    "Convert PPT to PDF",
+    "Convert Any File to PDF",
     "Extract Pages from PDF",
     "Merge PDFs",
     "Split PDF"
@@ -37,9 +69,9 @@ operation = st.selectbox("Select an operation:", [
 
 # ✅ Generate Empty PDF
 if operation == "Generate Empty PDF":
-    st.subheader("📝 Create an Empty PDF")
+    st.markdown('<p class="subheader">📝 Create an Empty PDF</p>', unsafe_allow_html=True)
     num_pages = st.number_input("Enter number of pages:", min_value=1, step=1)
-    if st.button("Generate Empty PDF", use_container_width=True):
+    if st.button("Generate Empty PDF"):
         output_pdf = BytesIO()
         pdf_canvas = canvas.Canvas(output_pdf)
         for i in range(num_pages):
@@ -50,47 +82,43 @@ if operation == "Generate Empty PDF":
         file_name = st.text_input("Enter output file name:", value="Empty_PDF")
         st.download_button("💚 Download Empty PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-# --- Upload File Section ---
-uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx", "txt"])
+# ✅ Upload File Section
+uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "doc", "pptx", "txt"])
 
 if uploaded_file:
     file_bytes = BytesIO(uploaded_file.getbuffer())
-    st.success(f"Uploaded {uploaded_file.name} successfully!")
+    st.success(f"✅ Uploaded: {uploaded_file.name}")
 
-    # ✅ Convert Multiple Images to Single PDF
-    if operation == "Convert Images to PDF":
-        st.subheader("🖼️ Convert Images to PDF")
-        uploaded_images = st.file_uploader("Upload multiple images", accept_multiple_files=True, type=["png", "jpg", "jpeg"])
-        if uploaded_images:
-            pdf_bytes = BytesIO()
-            image_list = [Image.open(img).convert("RGB") for img in uploaded_images]
-            first_image = image_list[0]
-            first_image.save(pdf_bytes, format="PDF", save_all=True, append_images=image_list[1:])
-            pdf_bytes.seek(0)
-            file_name = st.text_input("Enter output file name:", value="Images_to_PDF")
-            st.download_button("💚 Download PDF", data=pdf_bytes, file_name=f"{file_name}.pdf", mime="application/pdf")
+    # ✅ Convert Any File to PDF
+    if operation == "Convert Any File to PDF":
+        st.markdown('<p class="subheader">📂 Convert Any File to PDF</p>', unsafe_allow_html=True)
+        
+        # ✅ Convert Images to PDF
+        if uploaded_file.type.startswith("image"):
+            image = Image.open(file_bytes)
+            output_pdf = BytesIO()
+            image.save(output_pdf, "PDF", resolution=100.0)
+            output_pdf.seek(0)
+            file_name = st.text_input("Enter output file name:", value="Converted_Image")
+            st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-    # ✅ Convert TXT to PDF
-    elif operation == "Convert TXT to PDF" and uploaded_file.type == "text/plain":
-        st.subheader("📄 Convert TXT File to PDF")
-        text_content = uploaded_file.read().decode("utf-8")
-        output_pdf = BytesIO()
-        pdf_canvas = canvas.Canvas(output_pdf)
-        pdf_canvas.setFont("Helvetica", 12)
-        y_position = 750
-        for line in text_content.split("\n"):
-            pdf_canvas.drawString(50, y_position, line)
-            y_position -= 20
-        pdf_canvas.save()
-        output_pdf.seek(0)
-        file_name = st.text_input("Enter output file name:", value="Converted_TXT")
-        st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+        # ✅ Convert TXT to PDF
+        elif uploaded_file.type == "text/plain":
+            text_content = uploaded_file.read().decode("utf-8")
+            output_pdf = BytesIO()
+            pdf_canvas = canvas.Canvas(output_pdf)
+            pdf_canvas.setFont("Helvetica", 12)
+            y_position = 750
+            for line in text_content.split("\n"):
+                pdf_canvas.drawString(50, y_position, line)
+                y_position -= 20
+            pdf_canvas.save()
+            output_pdf.seek(0)
+            file_name = st.text_input("Enter output file name:", value="Converted_TXT")
+            st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-    # ✅ Convert MS Word (DOCX) to PDF
-    elif operation == "Convert MS Word (DOCX) to PDF":
-        st.subheader("📄 Convert MS Word (DOCX) to PDF")
-
-        if uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        # ✅ Convert DOCX/DOC to PDF
+        elif uploaded_file.type in ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword"]:
             try:
                 doc = Document(file_bytes)
                 output_pdf = BytesIO()
@@ -104,30 +132,25 @@ if uploaded_file:
                 output_pdf.seek(0)
                 file_name = st.text_input("Enter output file name:", value="Converted_Word")
                 st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
-
             except Exception as e:
                 st.error(f"❌ Error converting DOCX: {e}")
 
-        else:
-            st.error("❌ This file format is not supported. Please upload a valid DOCX file.")
-
-    # ✅ Convert PPT to PDF
-    elif operation == "Convert PPT to PDF" and uploaded_file.type == "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-        st.subheader("📄 Convert PPT to PDF")
-        prs = Presentation(file_bytes)
-        output_pdf = BytesIO()
-        pdf_canvas = canvas.Canvas(output_pdf)
-        pdf_canvas.setFont("Helvetica", 12)
-        y_position = 750
-        for slide in prs.slides:
-            for shape in slide.shapes:
-                if hasattr(shape, "text"):
-                    pdf_canvas.drawString(50, y_position, shape.text)
-                    y_position -= 20
-        pdf_canvas.save()
-        output_pdf.seek(0)
-        file_name = st.text_input("Enter output file name:", value="Converted_PPT")
-        st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+        # ✅ Convert PPT/PPTX to PDF
+        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+            prs = Presentation(file_bytes)
+            output_pdf = BytesIO()
+            pdf_canvas = canvas.Canvas(output_pdf)
+            pdf_canvas.setFont("Helvetica", 12)
+            y_position = 750
+            for slide in prs.slides:
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        pdf_canvas.drawString(50, y_position, shape.text)
+                        y_position -= 20
+            pdf_canvas.save()
+            output_pdf.seek(0)
+            file_name = st.text_input("Enter output file name:", value="Converted_PPT")
+            st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
 # ✅ Copyright Text at Bottom
 st.markdown(
