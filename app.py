@@ -10,7 +10,7 @@ st.set_page_config(page_title="PDF & File Converter", layout="wide")
 
 # ✅ Load Custom CSS
 def load_css():
-    with open("assets/style.css", "r") as css_file:
+    with open("assets/Style.css", "r") as css_file:
         st.markdown(f"<style>{css_file.read()}</style>", unsafe_allow_html=True)
 
 load_css()
