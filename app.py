@@ -1,111 +1,122 @@
 import streamlit as st
-import os
 from PyPDF2 import PdfReader, PdfWriter
+from PIL import Image
+from io import BytesIO
 from docx import Document
 from pptx import Presentation
 from reportlab.pdfgen import canvas
-from PIL import Image
 
-# Set page config
-st.set_page_config(page_title="PDF Well", page_icon="💚", layout="wide")
+st.set_page_config(page_title="PDF & File Converter", layout="wide")
 
-# Load custom CSS
-with open("assets/Style.css", "r") as css_file:
-    st.markdown(f"<style>{css_file.read()}</style>", unsafe_allow_html=True)
+# ✅ Load Custom CSS
+def load_css():
+    with open("assets/style.css", "r") as css_file:
+        st.markdown(f"<style>{css_file.read()}</style>", unsafe_allow_html=True)
 
-# Title
-st.title("PDF Well - All-in-One PDF Toolkit")
+load_css()
 
-# Sidebar
-st.sidebar.header("Choose an Action")
-option = st.sidebar.selectbox("Select an option:", ["Convert to PDF", "Extract Pages", "Merge PDFs", "Split PDF", "Create Empty PDF"])
+# ✅ Display Logo at the Top
+st.image("logo1.png", width=150)
 
-# File uploader
-uploaded_files = st.file_uploader("Upload your file(s)", accept_multiple_files=True)
+st.markdown('<p class="title">📄 PDF & File Converter</p>', unsafe_allow_html=True)
 
-# Process the selected option
-if option == "Convert to PDF":
-    if uploaded_files:
-        for uploaded_file in uploaded_files:
-            file_extension = uploaded_file.name.split(".")[-1].lower()
-            
-            if file_extension in ["png", "jpg", "jpeg"]:
-                image = Image.open(uploaded_file)
-                pdf_path = f"{uploaded_file.name}.pdf"
-                image.convert("RGB").save(pdf_path)
-                st.download_button("Download PDF", data=open(pdf_path, "rb"), file_name=pdf_path, mime="application/pdf")
+# --- Show Main Options ---
+operation = st.selectbox("Select an operation:", [
+    "Generate Empty PDF",
+    "Convert Any File to PDF",
+    "Extract Pages from PDF",
+    "Merge PDFs",
+    "Split PDF"
+])
 
-            elif file_extension in ["docx", "doc"]:
-                doc = Document(uploaded_file)
-                pdf_path = f"{uploaded_file.name}.pdf"
-                pdf = canvas.Canvas(pdf_path)
+# ✅ Generate Empty PDF
+if operation == "Generate Empty PDF":
+    st.markdown('<p class="subheader">📝 Create an Empty PDF</p>', unsafe_allow_html=True)
+    num_pages = st.number_input("Enter number of pages:", min_value=1, step=1)
+    if st.button("Generate Empty PDF"):
+        output_pdf = BytesIO()
+        pdf_canvas = canvas.Canvas(output_pdf)
+        for i in range(num_pages):
+            pdf_canvas.drawString(100, 750, f"Page {i+1}")
+            pdf_canvas.showPage()
+        pdf_canvas.save()
+        output_pdf.seek(0)
+        file_name = st.text_input("Enter output file name:", value="Empty_PDF")
+        st.download_button("💚 Download Empty PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+
+# ✅ Upload File Section
+uploaded_file = st.file_uploader("Upload a file", type=["pdf", "png", "jpg", "jpeg", "docx", "doc", "pptx", "txt"])
+
+if uploaded_file:
+    file_bytes = BytesIO(uploaded_file.getbuffer())
+    st.success(f"✅ Uploaded: {uploaded_file.name}")
+
+    # ✅ Convert Any File to PDF
+    if operation == "Convert Any File to PDF":
+        st.markdown('<p class="subheader">📂 Convert Any File to PDF</p>', unsafe_allow_html=True)
+
+        # ✅ Convert Images to PDF
+        if uploaded_file.type.startswith("image"):
+            image = Image.open(file_bytes)
+            output_pdf = BytesIO()
+            image.save(output_pdf, "PDF", resolution=100.0)
+            output_pdf.seek(0)
+            file_name = st.text_input("Enter output file name:", value="Converted_Image")
+            st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+
+        # ✅ Convert TXT to PDF
+        elif uploaded_file.type == "text/plain":
+            text_content = uploaded_file.read().decode("utf-8")
+            output_pdf = BytesIO()
+            pdf_canvas = canvas.Canvas(output_pdf)
+            pdf_canvas.setFont("Helvetica", 12)
+            y_position = 750
+            for line in text_content.split("\n"):
+                pdf_canvas.drawString(50, y_position, line)
+                y_position -= 20
+            pdf_canvas.save()
+            output_pdf.seek(0)
+            file_name = st.text_input("Enter output file name:", value="Converted_TXT")
+            st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+
+        # ✅ Convert DOCX/DOC to PDF
+        elif uploaded_file.type in ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword"]:
+            try:
+                doc = Document(file_bytes)
+                output_pdf = BytesIO()
+                pdf_canvas = canvas.Canvas(output_pdf)
+                pdf_canvas.setFont("Helvetica", 12)
+                y_position = 750
                 for para in doc.paragraphs:
-                    pdf.drawString(100, 800, para.text)
-                pdf.save()
-                st.download_button("Download PDF", data=open(pdf_path, "rb"), file_name=pdf_path, mime="application/pdf")
+                    pdf_canvas.drawString(50, y_position, para.text)
+                    y_position -= 20
+                pdf_canvas.save()
+                output_pdf.seek(0)
+                file_name = st.text_input("Enter output file name:", value="Converted_Word")
+                st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+            except Exception as e:
+                st.error(f"❌ Error converting DOCX: {e}")
 
-            elif file_extension in ["pptx", "ppt"]:
-                ppt = Presentation(uploaded_file)
-                pdf_path = f"{uploaded_file.name}.pdf"
-                pdf = canvas.Canvas(pdf_path)
-                for slide in ppt.slides:
-                    for shape in slide.shapes:
-                        if hasattr(shape, "text"):
-                            pdf.drawString(100, 800, shape.text)
-                pdf.save()
-                st.download_button("Download PDF", data=open(pdf_path, "rb"), file_name=pdf_path, mime="application/pdf")
+        # ✅ Convert PPT/PPTX to PDF
+        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+            prs = Presentation(file_bytes)
+            output_pdf = BytesIO()
+            pdf_canvas = canvas.Canvas(output_pdf)
+            pdf_canvas.setFont("Helvetica", 12)
+            y_position = 750
+            for slide in prs.slides:
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        pdf_canvas.drawString(50, y_position, shape.text)
+                        y_position -= 20
+            pdf_canvas.save()
+            output_pdf.seek(0)
+            file_name = st.text_input("Enter output file name:", value="Converted_PPT")
+            st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-            else:
-                st.error("Unsupported file format.")
-
-elif option == "Extract Pages":
-    if uploaded_files:
-        for uploaded_file in uploaded_files:
-            pdf_reader = PdfReader(uploaded_file)
-            pages = st.text_input("Enter page numbers to extract (comma-separated, e.g., 1,3,5)").split(",")
-            if st.button("Extract"):
-                pdf_writer = PdfWriter()
-                for page_num in pages:
-                    try:
-                        pdf_writer.add_page(pdf_reader.pages[int(page_num) - 1])
-                    except IndexError:
-                        st.error(f"Page {page_num} does not exist.")
-                output_path = "extracted_pages.pdf"
-                with open(output_path, "wb") as out_file:
-                    pdf_writer.write(out_file)
-                st.download_button("Download Extracted PDF", data=open(output_path, "rb"), file_name="extracted_pages.pdf", mime="application/pdf")
-
-elif option == "Merge PDFs":
-    if len(uploaded_files) > 1:
-        pdf_writer = PdfWriter()
-        for uploaded_file in uploaded_files:
-            pdf_reader = PdfReader(uploaded_file)
-            for page in pdf_reader.pages:
-                pdf_writer.add_page(page)
-        output_path = "merged.pdf"
-        with open(output_path, "wb") as out_file:
-            pdf_writer.write(out_file)
-        st.download_button("Download Merged PDF", data=open(output_path, "rb"), file_name="merged.pdf", mime="application/pdf")
-
-elif option == "Split PDF":
-    if uploaded_files:
-        for uploaded_file in uploaded_files:
-            pdf_reader = PdfReader(uploaded_file)
-            for i, page in enumerate(pdf_reader.pages):
-                pdf_writer = PdfWriter()
-                pdf_writer.add_page(page)
-                output_path = f"split_page_{i+1}.pdf"
-                with open(output_path, "wb") as out_file:
-                    pdf_writer.write(out_file)
-                st.download_button(f"Download Page {i+1}", data=open(output_path, "rb"), file_name=output_path, mime="application/pdf")
-
-elif option == "Create Empty PDF":
-    output_path = "empty.pdf"
-    pdf = canvas.Canvas(output_path)
-    for i in range(1, 6):  # 5 blank pages
-        pdf.showPage()
-    pdf.save()
-    st.download_button("Download Empty PDF", data=open(output_path, "rb"), file_name="empty.pdf", mime="application/pdf")
-
-# Copyright
-st.markdown("<small>© Pavan Sri Sai Mondem, Siva Satyamsetti, Uma Satyam Mounika Sapireddy, Bhuvaneswari Devi Seru, Chandu Meela</small>", unsafe_allow_html=True)
+# ✅ Copyright Text at Bottom
+st.markdown(
+    '<p class="small-text">© Content Owners: Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | '
+    'Bhuvaneswari Devi Seru | Chandu Meela</p>',
+    unsafe_allow_html=True
+        )
