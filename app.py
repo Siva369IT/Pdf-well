@@ -25,7 +25,10 @@ operation = st.selectbox("Select an operation:", [
     "Convert Any File to PDF",
     "Extract Pages from PDF",
     "Merge PDFs",
-    "Split PDF"
+    "Split PDF",
+    "Compress PDF",
+    "Insert Page Numbers",
+    "Organize PDF (Drag & Drop)"
 ])
 
 # ✅ Generate Empty PDF
@@ -50,107 +53,71 @@ uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "
 if uploaded_files:
     st.success(f"✅ {len(uploaded_files)} file(s) uploaded!")
 
-    # ✅ Convert Any File to PDF (Fixed Multiple Images)
-    if operation == "Convert Any File to PDF":
-        st.markdown('<p class="subheader">📂 Convert Any File to PDF</p>', unsafe_allow_html=True)
+    # ✅ PDF Compression
+    if operation == "Compress PDF":
+        st.markdown('<p class="subheader">📉 Compress PDF</p>', unsafe_allow_html=True)
 
-        if uploaded_files[0].type.startswith("image"):
-            output_pdf = BytesIO()
-            image_list = [Image.open(BytesIO(file.getbuffer())).convert("RGB") for file in uploaded_files]
+        pdf_reader = PdfReader(uploaded_files[0])
+        pdf_writer = PdfWriter()
 
-            if image_list:
-                first_image = image_list[0]
-                first_image.save(output_pdf, format="PDF", save_all=True, append_images=image_list[1:])
-                output_pdf.seek(0)
+        for page in pdf_reader.pages:
+            pdf_writer.add_page(page)
 
-                file_name = st.text_input("Enter output file name:", value="Images_to_PDF")
-                st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+        # Reduce file size by setting compression
+        pdf_writer.add_metadata({"/Producer": "PyPDF2 Compression"})
 
-    # ✅ Extract Pages from PDF (Fixed)
-    if operation == "Extract Pages from PDF":
-        st.markdown('<p class="subheader">📑 Extract Pages from PDF</p>', unsafe_allow_html=True)
+        output_pdf = BytesIO()
+        pdf_writer.write(output_pdf)
+        output_pdf.seek(0)
+
+        file_name = st.text_input("Enter output file name:", value="Compressed_PDF")
+        st.download_button("💚 Download Compressed PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+
+    # ✅ Insert Page Numbers
+    if operation == "Insert Page Numbers":
+        st.markdown('<p class="subheader">🔢 Insert Page Numbers</p>', unsafe_allow_html=True)
+
+        pdf_reader = PdfReader(uploaded_files[0])
+        pdf_writer = PdfWriter()
+
+        for i, page in enumerate(pdf_reader.pages):
+            page.merge_text("Page " + str(i + 1), (500, 20))  # Adding text to bottom of page
+            pdf_writer.add_page(page)
+
+        output_pdf = BytesIO()
+        pdf_writer.write(output_pdf)
+        output_pdf.seek(0)
+
+        file_name = st.text_input("Enter output file name:", value="Numbered_PDF")
+        st.download_button("💚 Download Numbered PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+
+    # ✅ Organize PDF (Drag & Drop)
+    if operation == "Organize PDF (Drag & Drop)":
+        st.markdown('<p class="subheader">📂 Reorder PDF Pages</p>', unsafe_allow_html=True)
+
         pdf_reader = PdfReader(uploaded_files[0])
         total_pages = len(pdf_reader.pages)
-        pages_input = st.text_input(f"Enter pages to extract (1-{total_pages}), e.g., 1,3-5:")
 
-        if st.button("Extract Pages"):
+        # Drag & Drop reordering
+        order = st.text_input(f"Enter new page order (1-{total_pages}), e.g., 3,1,2:")
+        
+        if st.button("Reorder & Save PDF"):
             try:
                 pdf_writer = PdfWriter()
-                selected_pages = []
+                new_order = [int(x) - 1 for x in order.split(",")]
 
-                for part in pages_input.split(","):
-                    if "-" in part:
-                        start, end = map(int, part.split("-"))
-                        selected_pages.extend(range(start - 1, end))
-                    else:
-                        selected_pages.append(int(part) - 1)
-
-                for page_num in selected_pages:
-                    pdf_writer.add_page(pdf_reader.pages[page_num])
+                for i in new_order:
+                    pdf_writer.add_page(pdf_reader.pages[i])
 
                 output_pdf = BytesIO()
                 pdf_writer.write(output_pdf)
                 output_pdf.seek(0)
 
-                file_name = st.text_input("Enter output file name:", value="Extracted_Pages")
-                st.download_button("💚 Download Extracted PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+                file_name = st.text_input("Enter output file name:", value="Reordered_PDF")
+                st.download_button("💚 Download Reordered PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
             except Exception as e:
-                st.error(f"❌ Error extracting pages: {e}")
-
-    # ✅ Merge PDFs (Fixed Multi-File Selection)
-    if operation == "Merge PDFs":
-        st.markdown('<p class="subheader">📂 Merge Multiple PDFs</p>', unsafe_allow_html=True)
-
-        if len(uploaded_files) < 2:
-            st.warning("⚠ Upload at least two PDFs to merge.")
-        else:
-            if st.button("Merge PDFs"):
-                try:
-                    pdf_writer = PdfWriter()
-                    for uploaded_file in uploaded_files:
-                        pdf_reader = PdfReader(uploaded_file)
-                        for page in pdf_reader.pages:
-                            pdf_writer.add_page(page)
-
-                    output_pdf = BytesIO()
-                    pdf_writer.write(output_pdf)
-                    output_pdf.seek(0)
-
-                    file_name = st.text_input("Enter output file name:", value="Merged_PDF")
-                    st.download_button("💚 Download Merged PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
-
-                except Exception as e:
-                    st.error(f"❌ Error merging PDFs: {e}")
-
-    # ✅ Split PDF (Fixed Proper Splitting)
-    if operation == "Split PDF":
-        st.markdown('<p class="subheader">✂ Split a PDF</p>', unsafe_allow_html=True)
-
-        pdf_reader = PdfReader(uploaded_files[0])
-        total_pages = len(pdf_reader.pages)
-        split_page = st.number_input(f"Enter split page (1-{total_pages-1}):", min_value=1, max_value=total_pages-1, step=1)
-
-        if st.button("Split PDF"):
-            try:
-                pdf_writer1, pdf_writer2 = PdfWriter(), PdfWriter()
-                for i in range(total_pages):
-                    if i < split_page:
-                        pdf_writer1.add_page(pdf_reader.pages[i])
-                    else:
-                        pdf_writer2.add_page(pdf_reader.pages[i])
-
-                output_pdf1, output_pdf2 = BytesIO(), BytesIO()
-                pdf_writer1.write(output_pdf1)
-                pdf_writer2.write(output_pdf2)
-                output_pdf1.seek(0)
-                output_pdf2.seek(0)
-                
-                st.download_button("💚 Download First Part", data=output_pdf1, file_name="Split_Part1.pdf", mime="application/pdf")
-                st.download_button("💚 Download Second Part", data=output_pdf2, file_name="Split_Part2.pdf", mime="application/pdf")
-
-            except Exception as e:
-                st.error(f"❌ Error splitting PDF: {e}")
+                st.error(f"❌ Error reordering pages: {e}")
 
 # ✅ Copyright Text at Bottom
 st.markdown('<p class="small-text">© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela</p>', unsafe_allow_html=True)
