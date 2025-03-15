@@ -6,6 +6,15 @@ from docx import Document
 from pptx import Presentation
 from reportlab.pdfgen import canvas
 
+# Inject custom web manifest
+manifest_code = """
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PDF Converter">
+<link rel="apple-touch-icon" href="logo1.png">
+"""
+st.markdown(manifest_code, unsafe_allow_html=True)
 st.set_page_config(page_title="PDF & File Converter", layout="wide")
 
 # ✅ Load Custom CSS
