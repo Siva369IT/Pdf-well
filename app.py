@@ -50,50 +50,34 @@ uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "
 if uploaded_files:
     st.success(f"✅ {len(uploaded_files)} file(s) uploaded!")
 
-    # ✅ Convert Any File to PDF
+    # ✅ Convert Any File to PDF (Fixed Multiple Images)
     if operation == "Convert Any File to PDF":
         st.markdown('<p class="subheader">📂 Convert Any File to PDF</p>', unsafe_allow_html=True)
 
-        uploaded_file = uploaded_files[0]
-        file_bytes = BytesIO(uploaded_file.getbuffer())
-
-        # ✅ Convert Images to PDF
-        if uploaded_file.type.startswith("image"):
-            image = Image.open(file_bytes)
+        if uploaded_files[0].type.startswith("image"):
             output_pdf = BytesIO()
-            image.save(output_pdf, "PDF", resolution=100.0)
-            output_pdf.seek(0)
-            file_name = st.text_input("Enter output file name:", value="Converted_Image")
-            st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+            image_list = [Image.open(BytesIO(file.getbuffer())).convert("RGB") for file in uploaded_files]
 
-        # ✅ Convert TXT to PDF
-        elif uploaded_file.type == "text/plain":
-            text_content = uploaded_file.read().decode("utf-8")
-            output_pdf = BytesIO()
-            pdf_canvas = canvas.Canvas(output_pdf)
-            pdf_canvas.setFont("Helvetica", 12)
-            y_position = 750
-            for line in text_content.split("\n"):
-                pdf_canvas.drawString(50, y_position, line)
-                y_position -= 20
-            pdf_canvas.save()
-            output_pdf.seek(0)
-            file_name = st.text_input("Enter output file name:", value="Converted_TXT")
-            st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+            if image_list:
+                first_image = image_list[0]
+                first_image.save(output_pdf, format="PDF", save_all=True, append_images=image_list[1:])
+                output_pdf.seek(0)
 
-    # ✅ Extract Pages from PDF (Fixed Download)
+                file_name = st.text_input("Enter output file name:", value="Images_to_PDF")
+                st.download_button("💚 Download PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+
+    # ✅ Extract Pages from PDF (Fixed)
     if operation == "Extract Pages from PDF":
         st.markdown('<p class="subheader">📑 Extract Pages from PDF</p>', unsafe_allow_html=True)
-
         pdf_reader = PdfReader(uploaded_files[0])
         total_pages = len(pdf_reader.pages)
         pages_input = st.text_input(f"Enter pages to extract (1-{total_pages}), e.g., 1,3-5:")
-        
+
         if st.button("Extract Pages"):
             try:
                 pdf_writer = PdfWriter()
                 selected_pages = []
-                
+
                 for part in pages_input.split(","):
                     if "-" in part:
                         start, end = map(int, part.split("-"))
@@ -139,7 +123,7 @@ if uploaded_files:
                 except Exception as e:
                     st.error(f"❌ Error merging PDFs: {e}")
 
-    # ✅ Split PDF (Now Works Properly)
+    # ✅ Split PDF (Fixed Proper Splitting)
     if operation == "Split PDF":
         st.markdown('<p class="subheader">✂ Split a PDF</p>', unsafe_allow_html=True)
 
