@@ -120,4 +120,4 @@ if uploaded_files:
                 st.error(f"❌ Error reordering pages: {e}")
 
 # ✅ Copyright Text at Bottom
-st.markdown('<p class="small-text">© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela</p>', unsafe_allow_html=True)
+st.markdown('<p class="small-text">© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela ||Trainees from techwing 🧡||</p>', unsafe_allow_html=True)
