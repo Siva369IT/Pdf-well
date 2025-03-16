@@ -205,11 +205,10 @@ if uploaded_files:
         st.download_button("📄 Download Numbered PDF", data=output_pdf, file_name="Numbered_PDF.pdf", mime="application/pdf")
 
 # ✅ Copyright (Fixed at bottom)
-# ✅ Copyright (Fixed at bottom)
-# ✅ Copyright (Fixed at bottom)
 st.markdown("""
-    <div class="small-text">
-        © Content Owners: Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | 
+    <p style="font-size:12px; text-align:center; color:#888; margin-top:20px;">
+        © Content Owners: <br>
+        Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | <br>
         Bhuvaneswari Devi Seru | Chandu Meela | Trainees from Techwing 🧡
-    </div>
+    </p>
 """, unsafe_allow_html=True)
