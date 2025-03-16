@@ -4,3 +4,4 @@ Pillow
 python-docx
 reportlab
 python-pptx
+PyMuPDF
