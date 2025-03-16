@@ -36,7 +36,7 @@ if operation == "Generate Empty PDF":
     st.subheader("📄 Generate an Empty PDF")
 
     # ✅ Enter Number of Pages
-    num_pages = st.number_input("Enter number of pages:", min_value=1, max_value=100, value=1, step=1)
+    num_pages = st.number_input("Enter number of pages:", min_value=1, max_value=3000, value=1, step=1)
 
     # ✅ Button to Generate PDF
     generate_btn = st.button("Generate an Empty PDF")
@@ -206,7 +206,21 @@ if uploaded_files:
 
 # ✅ Copyright
 st.markdown("""
-    <div style="position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 12px; color: gray;">
+    <style>
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            text-align: center;
+            padding: 5px;
+            font-size: 12px;
+            color: gray;
+            box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <div class="footer">
         © Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Trainees from Techwing 🧡
     </div>
 """, unsafe_allow_html=True)
