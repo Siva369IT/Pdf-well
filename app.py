@@ -5,6 +5,7 @@ from io import BytesIO
 from docx import Document
 from pptx import Presentation
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 st.set_page_config(page_title="PDF & File Converter", layout="wide")
 
@@ -73,19 +74,19 @@ if uploaded_files:
         file_name = st.text_input("Enter output file name:", value="Compressed_PDF")
         st.download_button("💚 Download Compressed PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-    # ✅ Insert Page Numbers
+    # ✅ Insert Page Numbers (Fixed Code)
     if operation == "Insert Page Numbers":
         st.markdown('<p class="subheader">🔢 Insert Page Numbers</p>', unsafe_allow_html=True)
 
         pdf_reader = PdfReader(uploaded_files[0])
-        pdf_writer = PdfWriter()
+        output_pdf = BytesIO()
+        c = canvas.Canvas(output_pdf, pagesize=letter)
 
         for i, page in enumerate(pdf_reader.pages):
-            page.merge_text("Page " + str(i + 1), (500, 20))  # Adding text to bottom of page
-            pdf_writer.add_page(page)
+            c.drawString(500, 20, f"Page {i + 1}")  # Add page number at bottom
+            c.showPage()
 
-        output_pdf = BytesIO()
-        pdf_writer.write(output_pdf)
+        c.save()
         output_pdf.seek(0)
 
         file_name = st.text_input("Enter output file name:", value="Numbered_PDF")
@@ -120,4 +121,4 @@ if uploaded_files:
                 st.error(f"❌ Error reordering pages: {e}")
 
 # ✅ Copyright Text at Bottom
-st.markdown('<p class="small-text">© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela |Trainees from techwing 🧡</p>', unsafe_allow_html=True)
+st.markdown('<p class="small-text">© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela |Trainees from Techwing 🧡</p>', unsafe_allow_html=True)
