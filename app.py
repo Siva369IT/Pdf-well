@@ -26,9 +26,9 @@ operation = st.selectbox("Select an operation:", [
     "Convert Any File to PDF",
     "Extract Pages from PDF",
     "Merge PDFs",
-    "Split PDF",
+    "Split PDF 1 to 2 pdf's",
     "Compress PDF",
-    "Insert Page Numbers",
+    "Insert Page Numbers to pdf",
     "Organize PDF (Drag & Drop)"
 ])
 
