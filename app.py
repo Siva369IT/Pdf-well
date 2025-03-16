@@ -32,7 +32,32 @@ operation = st.selectbox("Select an operation:", [
     "Insert Page Numbers to PDF",
     "Organize PDF (Drag & Drop)"
 ])
+# ✅ Generate Empty PDF Functionality
+if operation == "Generate Empty PDF":
+    st.subheader("📄 Generate an Empty PDF")
 
+    # ✅ Enter Number of Pages
+    num_pages = st.number_input("Enter number of pages:", min_value=1, max_value=100, value=1, step=1)
+
+    # ✅ Button to Generate PDF
+    generate_btn = st.button("Generate an Empty PDF")
+
+    if generate_btn:
+        output_pdf = BytesIO()
+        pdf_canvas = canvas.Canvas(output_pdf, pagesize=letter)
+        pdf_canvas.setFont("Helvetica", 12)
+
+        for i in range(num_pages):
+            pdf_canvas.drawString(100, 750, f"Page {i+1}")
+            pdf_canvas.showPage()
+
+        pdf_canvas.save()
+        output_pdf.seek(0)
+
+        st.success(f"✅ Empty PDF with {num_pages} pages generated!")
+        st.download_button("📥 Download Empty PDF", data=output_pdf, file_name="Empty_PDF.pdf", mime="application/pdf")
+
+    st.stop()  # ✅ Stops execution for other operations
 # ✅ File Upload Section
 uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx", "txt"], accept_multiple_files=True)
 
