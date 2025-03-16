@@ -64,7 +64,6 @@ if uploaded_files:
         for page in pdf_reader.pages:
             pdf_writer.add_page(page)
 
-        # Reduce file size by setting compression
         pdf_writer.add_metadata({"/Producer": "PyPDF2 Compression"})
 
         output_pdf = BytesIO()
@@ -74,19 +73,29 @@ if uploaded_files:
         file_name = st.text_input("Enter output file name:", value="Compressed_PDF")
         st.download_button("💚 Download Compressed PDF", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-    # ✅ Insert Page Numbers (Fixed Code)
+    # ✅ Insert Page Numbers (Fixed)
     if operation == "Insert Page Numbers":
         st.markdown('<p class="subheader">🔢 Insert Page Numbers</p>', unsafe_allow_html=True)
 
         pdf_reader = PdfReader(uploaded_files[0])
         output_pdf = BytesIO()
-        c = canvas.Canvas(output_pdf, pagesize=letter)
+        pdf_writer = PdfWriter()
 
         for i, page in enumerate(pdf_reader.pages):
+            packet = BytesIO()
+            c = canvas.Canvas(packet, pagesize=letter)
+            c.setFont("Helvetica", 12)
             c.drawString(500, 20, f"Page {i + 1}")  # Add page number at bottom
-            c.showPage()
+            c.save()
 
-        c.save()
+            packet.seek(0)
+
+            # Merge the page number with the existing page
+            overlay_reader = PdfReader(packet)
+            page.merge_page(overlay_reader.pages[0])
+            pdf_writer.add_page(page)
+
+        pdf_writer.write(output_pdf)
         output_pdf.seek(0)
 
         file_name = st.text_input("Enter output file name:", value="Numbered_PDF")
@@ -99,7 +108,6 @@ if uploaded_files:
         pdf_reader = PdfReader(uploaded_files[0])
         total_pages = len(pdf_reader.pages)
 
-        # Drag & Drop reordering
         order = st.text_input(f"Enter new page order (1-{total_pages}), e.g., 3,1,2:")
         
         if st.button("Reorder & Save PDF"):
@@ -121,4 +129,4 @@ if uploaded_files:
                 st.error(f"❌ Error reordering pages: {e}")
 
 # ✅ Copyright Text at Bottom
-st.markdown('<p class="small-text">© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela |Trainees from Techwing 🧡</p>', unsafe_allow_html=True)
+st.markdown('<p class="small-text">© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Trainees from Techwing 🧡</p>', unsafe_allow_html=True)
