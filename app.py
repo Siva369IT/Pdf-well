@@ -75,7 +75,7 @@ if uploaded_files:
 
     # ✅ Insert Page Numbers (Fixed)
     if operation == "Insert Page Numbers":
-        st.markdown('<p class="subheader">🔢 Insert Page Numbers</p>', unsafe_allow_html=True)
+        st.markdown('<p class="subheader">🔢 Insert Page Numbers to pdf</p>', unsafe_allow_html=True)
 
         pdf_reader = PdfReader(uploaded_files[0])
         output_pdf = BytesIO()
