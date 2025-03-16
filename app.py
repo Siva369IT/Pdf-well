@@ -61,91 +61,43 @@ uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "
 if uploaded_files:
     st.success(f"✅ {len(uploaded_files)} file(s) uploaded!")
 
-    # ✅ Convert Any File to PDF
-    if operation == "Convert Any File to PDF ♻️":
-        for uploaded_file in uploaded_files:
-            file_name = uploaded_file.name.rsplit(".", 1)[0]
-            file_extension = uploaded_file.name.rsplit(".", 1)[-1].lower()
+    # ✅ Split PDF (Newly Added)
+    if operation == "Split PDF (1 to 2 📑 PDFs)":
+        st.subheader("✂ Split PDF into Two Parts")
+        uploaded_pdf = uploaded_files[0]  # Take the first uploaded file
+        pdf_reader = PdfReader(uploaded_pdf)
+        total_pages = len(pdf_reader.pages)
 
-            output_pdf = BytesIO()
+        if total_pages > 1:
+            # ✅ Select the split point
+            split_page = st.number_input("Enter the page number where you want to split:", 
+                                         min_value=1, max_value=total_pages-1, value=total_pages//2)
 
-            if file_extension in ["png", "jpg", "jpeg"]:
-                Image.open(uploaded_file).convert("RGB").save(output_pdf, format="PDF")
-                output_pdf.seek(0)
+            part1_writer, part2_writer = PdfWriter(), PdfWriter()
 
-            elif file_extension == "txt":
-                pdf_canvas = canvas.Canvas(output_pdf, pagesize=letter)
-                pdf_canvas.setFont("Helvetica", 12)
-                y_position = 750
-                for line in uploaded_file.getvalue().decode().split("\n"):
-                    pdf_canvas.drawString(100, y_position, line)
-                    y_position -= 20
-                pdf_canvas.save()
-                output_pdf.seek(0)
+            # ✅ First Part
+            for i in range(split_page):
+                part1_writer.add_page(pdf_reader.pages[i])
 
-            elif file_extension == "docx":
-                doc = Document(uploaded_file)
-                pdf_canvas = canvas.Canvas(output_pdf, pagesize=letter)
-                pdf_canvas.setFont("Helvetica", 12)
-                y_position = 750
-                for para in doc.paragraphs:
-                    pdf_canvas.drawString(100, y_position, para.text)
-                    y_position -= 20
-                pdf_canvas.save()
-                output_pdf.seek(0)
+            # ✅ Second Part
+            for i in range(split_page, total_pages):
+                part2_writer.add_page(pdf_reader.pages[i])
 
-            elif file_extension == "pptx":
-                ppt = Presentation(uploaded_file)
-                pdf_canvas = canvas.Canvas(output_pdf, pagesize=letter)
-                pdf_canvas.setFont("Helvetica", 12)
-                y_position = 750
-                for slide in ppt.slides:
-                    for shape in slide.shapes:
-                        if hasattr(shape, "text"):
-                            pdf_canvas.drawString(100, y_position, shape.text)
-                            y_position -= 20
-                pdf_canvas.save()
-                output_pdf.seek(0)
+            # ✅ Save Outputs
+            output1, output2 = BytesIO(), BytesIO()
+            part1_writer.write(output1)
+            part2_writer.write(output2)
+            output1.seek(0)
+            output2.seek(0)
 
-            else:
-                st.error(f"❌ Unsupported file format: {file_extension}")
-                continue
+            # ✅ Download Buttons
+            st.download_button("📄 Download First Part", data=output1, file_name="Split_Part1.pdf", mime="application/pdf")
+            st.download_button("📄 Download Second Part", data=output2, file_name="Split_Part2.pdf", mime="application/pdf")
 
-            st.download_button(f"📥 Download {file_name}.pdf", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
-# ✅ Split PDF Functionality
-elif operation == "Split PDF (1 to 2 PDFs)":
-    uploaded_pdf = uploaded_files[0]  # First uploaded PDF
-    pdf_reader = PdfReader(uploaded_pdf)
-    total_pages = len(pdf_reader.pages)
+        else:
+            st.error("❌ The PDF must have at least 2 pages to split.")
 
-    if total_pages > 1:
-        # ✅ Select the split point (User Input)
-        split_page = st.number_input("Enter the page number where you want to split:", min_value=1, max_value=total_pages-1, value=total_pages//2)
-
-        part1_writer, part2_writer = PdfWriter(), PdfWriter()
-
-        # ✅ First Part
-        for i in range(split_page):
-            part1_writer.add_page(pdf_reader.pages[i])
-
-        # ✅ Second Part
-        for i in range(split_page, total_pages):
-            part2_writer.add_page(pdf_reader.pages[i])
-
-        # ✅ Save Outputs
-        output1, output2 = BytesIO(), BytesIO()
-        part1_writer.write(output1)
-        part2_writer.write(output2)
-        output1.seek(0)
-        output2.seek(0)
-
-        # ✅ Download Buttons
-        st.download_button("📄 Download First Part", data=output1, file_name="Split_Part1.pdf", mime="application/pdf")
-        st.download_button("📄 Download Second Part", data=output2, file_name="Split_Part2.pdf", mime="application/pdf")
-
-    else:
-        st.error("❌ The PDF must have at least 2 pages to split.")
-# ✅ Extract Pages from PDF
+    # ✅ Extract Pages from PDF
     elif operation == "Extract Pages from PDF 🪓":
         pdf_reader = PdfReader(uploaded_files[0])
         pages_to_extract = st.text_input("Enter page numbers (comma-separated):")
@@ -208,4 +160,4 @@ elif operation == "Split PDF (1 to 2 PDFs)":
         st.download_button("📄 Download Numbered PDF", data=output_pdf, file_name="Numbered_PDF.pdf", mime="application/pdf")
 
 # ✅ Footer
-st.markdown('<div class="footer">© Pavan srisai mondem |Siva satyamsetti |Uma satya mounika sapireddy |Bhuvaneswari Devi seru|Chandu meela|Techwing Trainees 🧡</div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">© Pavan srisai mondem | Siva satyamsetti | Uma satya mounika sapireddy | Bhuvaneswari Devi seru | Chandu meela | Techwing Trainees 🧡</div>', unsafe_allow_html=True)
