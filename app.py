@@ -60,7 +60,58 @@ uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "
 
 if uploaded_files:
     st.success(f"✅ {len(uploaded_files)} file(s) uploaded!")
+# ✅ Convert Any File to PDF
+elif operation == "Convert Any File to PDF ♻️":
+    st.subheader("📄 Convert Any File to PDF")
 
+    for uploaded_file in uploaded_files:
+        file_name = uploaded_file.name.rsplit(".", 1)[0]
+        file_extension = uploaded_file.name.rsplit(".", 1)[-1].lower()
+
+        output_pdf = BytesIO()
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=15)
+
+        if file_extension in ["png", "jpg", "jpeg"]:
+            img = Image.open(uploaded_file).convert("RGB")
+            img_buffer = BytesIO()
+            img.save(img_buffer, format="PDF")
+            output_pdf.write(img_buffer.getvalue())
+
+        elif file_extension == "txt":
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            content = uploaded_file.getvalue().decode("utf-8")
+            for line in content.split("\n"):
+                pdf.cell(200, 10, line, ln=True)
+
+        elif file_extension == "docx":
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            doc = Document(uploaded_file)
+            for para in doc.paragraphs:
+                pdf.multi_cell(190, 10, para.text)
+
+        elif file_extension == "pptx":
+            ppt = Presentation(uploaded_file)
+            pdf.set_auto_page_break(auto=True, margin=10)
+            for slide in ppt.slides:
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        pdf.add_page()
+                        pdf.set_font("Arial", size=12)
+                        pdf.multi_cell(190, 10, shape.text)
+
+        else:
+            st.error(f"❌ Unsupported file format: {file_extension}")
+            continue
+
+        # Save PDF
+        pdf.output(output_pdf)
+        output_pdf.seek(0)
+
+        # Download Button
+        st.download_button(f"📥 Download {file_name}.pdf", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
     # ✅ Split PDF (Newly Added)
     if operation == "Split PDF (1 to 2 📑 PDFs)":
         st.subheader("✂ Split PDF into Two Parts")
