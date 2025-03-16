@@ -206,23 +206,8 @@ if uploaded_files:
 
 # ✅ Copyright
 st.markdown(
-    """
-    <style>
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: white;
-            text-align: center;
-            padding: 5px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-    </style>
-    <div class="footer">
-        © Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | 
-        Bhuvaneswari Devi Seru | Chandu Meela | Trainees from Techwing 🧡
-    </div>
-    """,
+    '<p style="text-align: center; font-size: 12px; color: #555;">'
+    '© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | '
+    'Bhuvaneswari Devi Seru | Chandu Meela | Trainees from Techwing 🧡</p>',
     unsafe_allow_html=True
 )
