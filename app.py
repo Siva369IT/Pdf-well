@@ -61,7 +61,7 @@ uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "
 if uploaded_files:
     st.success(f"✅ {len(uploaded_files)} file(s) uploaded!")
 
-    # ✅ Split PDF 
+    # ✅ Split PDF (Newly Added)
     if operation == "Split PDF (1 to 2 📑 PDFs)":
         st.subheader("✂ Split PDF into Two Parts")
         uploaded_pdf = uploaded_files[0]  # Take the first uploaded file
@@ -159,37 +159,5 @@ if uploaded_files:
         output_pdf.seek(0)
         st.download_button("📄 Download Numbered PDF", data=output_pdf, file_name="Numbered_PDF.pdf", mime="application/pdf")
 
-    # ✅ Convert Any File to PDF
-    elif operation == "Convert Any File to PDF ♻️":
-        st.subheader("📄 Convert Any File to PDF")
-        for uploaded_file in uploaded_files:
-            file_name = uploaded_file.name.rsplit(".", 1)[0]
-            file_extension = uploaded_file.name.rsplit(".", 1)[-1].lower()
-
-            output_pdf = BytesIO()
-            pdf = canvas.Canvas(output_pdf, pagesize=letter)
-
-            if file_extension in ["png", "jpg", "jpeg"]:
-                img = Image.open(uploaded_file).convert("RGB")
-                img.save(output_pdf, format="PDF")
-
-            elif file_extension == "txt":
-                pdf.setFont("Helvetica", 12)
-                content = uploaded_file.getvalue().decode("utf-8")
-                for line in content.split("\n"):
-                    pdf.drawString(100, 750, line)
-                    pdf.showPage()
-                pdf.save()
-
-            elif file_extension == "docx":
-                doc = Document(uploaded_file)
-                for para in doc.paragraphs:
-                    pdf.drawString(100, 750, para.text)
-                    pdf.showPage()
-                pdf.save()
-
-            output_pdf.seek(0)
-            st.download_button(f"📥 Download {file_name}.pdf", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
-
 # ✅ Footer
-st.markdown('<div class="footer">© Pavan sri sai mondem |Siva satyamsetti |uma satya mounika sapireddy |Bhuvaneswari Devi Seru | Chandu meela | Techwing Trainees 🧡</div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">© Pavan srisai mondem | Siva satyamsetti | Uma satya mounika sapireddy | Bhuvaneswari Devi seru | Chandu meela | Techwing Trainees 🧡</div>', unsafe_allow_html=True)
