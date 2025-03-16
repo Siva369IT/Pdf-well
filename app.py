@@ -206,7 +206,11 @@ if uploaded_files:
 
 # ✅ Copyright (Fixed at bottom)
 st.markdown(
-    '<p class="small-text">© Content Owners: Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | '
-    'Bhuvaneswari Devi Seru | Chandu Meela | Trainees from Techwing 🧡</p>',
+    """
+    <div class="footer">
+        © Content Owners: Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | 
+        Bhuvaneswari Devi Seru | Chandu Meela | Trainees from Techwing 🧡
+    </div>
+    """, 
     unsafe_allow_html=True
 )
