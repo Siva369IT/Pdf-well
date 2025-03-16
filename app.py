@@ -23,20 +23,20 @@ st.markdown('<p class="title">📄 PDF & File Converter</p>', unsafe_allow_html=
 
 # --- Select Operation ---
 operation = st.selectbox("Select an operation:", [
-    "Generate Empty PDF",
-    "Convert Any File to PDF",
-    "Extract Pages from PDF",
-    "Merge PDFs",
-    "Split PDF (1 to 2 PDFs)",
-    "Compress PDF",
-    "Insert Page Numbers to PDF"
+    "Generate Empty PDF 🖨️",
+    "Convert Any File to PDF ♻️",
+    "Extract Pages from PDF🪓",
+    "Merge PDFs📄+📃 ",
+    "Split PDF (1 to 2 📑PDFs)",
+    "Compress PDF 📉",
+    "Insert Page Numbers 📝 to PDF"
 ])
 # ✅ Generate Empty PDF Functionality
 if operation == "Generate Empty PDF":
     st.subheader("📄 Generate an Empty PDF")
 
     # ✅ Enter Number of Pages
-    num_pages = st.number_input("Enter number of pages:", min_value=1, max_value=3000, value=1, step=1)
+    num_pages = st.number_input("Enter number of pages:", min_value=1, max_value=100000, value=1, step=1)
 
     # ✅ Button to Generate PDF
     generate_btn = st.button("Generate an Empty PDF")
