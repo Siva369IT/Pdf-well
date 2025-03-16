@@ -205,22 +205,10 @@ if uploaded_files:
         st.download_button("📄 Download Numbered PDF", data=output_pdf, file_name="Numbered_PDF.pdf", mime="application/pdf")
 
 # ✅ Copyright
-st.markdown("""
-    <style>
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: white;
-            text-align: center;
-            padding: 5px;
-            font-size: 12px;
-            color: gray;
-            box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-    <div class="footer">
-        © Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Trainees from Techwing 🧡
-    </div>
-""", unsafe_allow_html=True)
+st.markdown(
+    '<p style="font-size:12px; text-align:center;">'
+    "© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | "
+    "Bhuvaneswari Devi Seru | Chandu Meela | Trainees from Techwing 🧡"
+    "</p>",
+    unsafe_allow_html=True
+)
