@@ -60,97 +60,51 @@ uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "
 
 if uploaded_files:
     st.success(f"✅ {len(uploaded_files)} file(s) uploaded!")
-    
+
     # ✅ Convert Any File to PDF
     if operation == "Convert Any File to PDF ♻️":
         st.subheader("🔄 Convert Any File to PDF")
-
         for uploaded_file in uploaded_files:
             file_name = uploaded_file.name.split(".")[0]
             file_extension = uploaded_file.name.split(".")[-1].lower()
-
             output_pdf = BytesIO()
 
             if file_extension in ["png", "jpg", "jpeg"]:
                 image = Image.open(uploaded_file)
                 image.convert("RGB").save(output_pdf, format="PDF")
-                output_pdf.seek(0)
-
             elif file_extension == "txt":
                 pdf_canvas = canvas.Canvas(output_pdf, pagesize=letter)
-                pdf_canvas.setFont("Helvetica", 12)
-                y_position = 750
                 for line in uploaded_file.getvalue().decode().split("\n"):
-                    pdf_canvas.drawString(100, y_position, line)
-                    y_position -= 20
+                    pdf_canvas.drawString(100, 750, line)
+                    pdf_canvas.showPage()
                 pdf_canvas.save()
-                output_pdf.seek(0)
-
             elif file_extension == "docx":
                 doc = Document(uploaded_file)
                 pdf_canvas = canvas.Canvas(output_pdf, pagesize=letter)
-                pdf_canvas.setFont("Helvetica", 12)
-                y_position = 750
                 for para in doc.paragraphs:
-                    pdf_canvas.drawString(100, y_position, para.text)
-                    y_position -= 20
+                    pdf_canvas.drawString(100, 750, para.text)
+                    pdf_canvas.showPage()
                 pdf_canvas.save()
-                output_pdf.seek(0)
-
             elif file_extension == "pptx":
                 ppt = Presentation(uploaded_file)
                 pdf_canvas = canvas.Canvas(output_pdf, pagesize=letter)
-                pdf_canvas.setFont("Helvetica", 12)
-                y_position = 750
                 for slide in ppt.slides:
                     for shape in slide.shapes:
                         if hasattr(shape, "text"):
-                            pdf_canvas.drawString(100, y_position, shape.text)
-                            y_position -= 20
+                            pdf_canvas.drawString(100, 750, shape.text)
+                            pdf_canvas.showPage()
                 pdf_canvas.save()
-                output_pdf.seek(0)
-
             else:
                 st.error(f"❌ Unsupported file format: {file_extension}")
                 continue
 
+            output_pdf.seek(0)
             st.download_button(f"📥 Download {file_name}.pdf", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
-
-    # ✅ Split PDF
-    elif operation == "Split PDF (1 to 2 📑 PDFs)":
-        st.subheader("✂ Split PDF into Two Parts")
-        uploaded_pdf = uploaded_files[0]  
-        pdf_reader = PdfReader(uploaded_pdf)
-        total_pages = len(pdf_reader.pages)
-
-        if total_pages > 1:
-            split_page = st.number_input("Enter the split page number:", min_value=1, max_value=total_pages-1, value=total_pages//2)
-
-            part1_writer, part2_writer = PdfWriter(), PdfWriter()
-
-            for i in range(split_page):
-                part1_writer.add_page(pdf_reader.pages[i])
-
-            for i in range(split_page, total_pages):
-                part2_writer.add_page(pdf_reader.pages[i])
-
-            output1, output2 = BytesIO(), BytesIO()
-            part1_writer.write(output1)
-            part2_writer.write(output2)
-            output1.seek(0)
-            output2.seek(0)
-
-            st.download_button("📄 Download First Part", data=output1, file_name="Split_Part1.pdf", mime="application/pdf")
-            st.download_button("📄 Download Second Part", data=output2, file_name="Split_Part2.pdf", mime="application/pdf")
-
-        else:
-            st.error("❌ The PDF must have at least 2 pages to split.")
 
     # ✅ Extract Pages from PDF
     elif operation == "Extract Pages from PDF 🪓":
         pdf_reader = PdfReader(uploaded_files[0])
         pages_to_extract = st.text_input("Enter page numbers (comma-separated):")
-
         if st.button("Extract"):
             if pages_to_extract:
                 selected_pages = [int(p.strip()) - 1 for p in pages_to_extract.split(",")]
@@ -160,7 +114,6 @@ if uploaded_files:
                         pdf_writer.add_page(pdf_reader.pages[p])
                     else:
                         st.error(f"Invalid page number: {p+1}")
-
                 output_pdf = BytesIO()
                 pdf_writer.write(output_pdf)
                 output_pdf.seek(0)
@@ -173,11 +126,57 @@ if uploaded_files:
             pdf_reader = PdfReader(file)
             for page in pdf_reader.pages:
                 pdf_writer.add_page(page)
-
         output_pdf = BytesIO()
         pdf_writer.write(output_pdf)
         output_pdf.seek(0)
         st.download_button("📥 Download Merged PDF", data=output_pdf, file_name="Merged_PDF.pdf", mime="application/pdf")
 
+    # ✅ Split PDF
+    elif operation == "Split PDF (1 to 2 📑 PDFs)":
+        pdf_reader = PdfReader(uploaded_files[0])
+        split_page = st.number_input("Enter the split page number:", min_value=1, max_value=len(pdf_reader.pages) - 1)
+        if st.button("Split PDF"):
+            part1_writer, part2_writer = PdfWriter(), PdfWriter()
+            for i in range(split_page):
+                part1_writer.add_page(pdf_reader.pages[i])
+            for i in range(split_page, len(pdf_reader.pages)):
+                part2_writer.add_page(pdf_reader.pages[i])
+            output1, output2 = BytesIO(), BytesIO()
+            part1_writer.write(output1)
+            part2_writer.write(output2)
+            output1.seek(0)
+            output2.seek(0)
+            st.download_button("📄 Download First Part", data=output1, file_name="Split_Part1.pdf", mime="application/pdf")
+            st.download_button("📄 Download Second Part", data=output2, file_name="Split_Part2.pdf", mime="application/pdf")
+
+    # ✅ Compress PDF
+    elif operation == "Compress PDF 📉":
+        pdf_reader = fitz.open(stream=uploaded_files[0].getvalue(), filetype="pdf")
+        output_pdf = BytesIO()
+        pdf_writer = fitz.open()
+        for page in pdf_reader:
+            pix = page.get_pixmap()
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            img.save(output_pdf, format="PDF")
+        output_pdf.seek(0)
+        st.download_button("📥 Download Compressed PDF", data=output_pdf, file_name="Compressed_PDF.pdf", mime="application/pdf")
+
+    # ✅ Insert Page Numbers
+    elif operation == "Insert Page Numbers 📝 to PDF":
+        pdf_reader = PdfReader(uploaded_files[0])
+        pdf_writer = PdfWriter()
+        for i, page in enumerate(pdf_reader.pages):
+            page.add_annotation({
+                "subtype": "FreeText",
+                "rect": [500, 20, 580, 40],
+                "contents": f"Page {i+1}",
+                "color": (1, 0, 0)
+            })
+            pdf_writer.add_page(page)
+        output_pdf = BytesIO()
+        pdf_writer.write(output_pdf)
+        output_pdf.seek(0)
+        st.download_button("📥 Download Numbered PDF", data=output_pdf, file_name="Numbered_PDF.pdf", mime="application/pdf")
+
 # ✅ Footer
-st.markdown('<div class="footer">© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Techwing Trainees 🧡</div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">© Pavan sri sai mondem |Siva satyamsetti |Uma satya mounika sapireddy |Bhuvaneswari Devi Seru | Chandu meela | Techwing Trainees 🧡 </div>', unsafe_allow_html=True)
