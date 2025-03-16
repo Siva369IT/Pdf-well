@@ -29,8 +29,7 @@ operation = st.selectbox("Select an operation:", [
     "Merge PDFs",
     "Split PDF (1 to 2 PDFs)",
     "Compress PDF",
-    "Insert Page Numbers to PDF",
-    "Organize PDF (Drag & Drop)"
+    "Insert Page Numbers to PDF"
 ])
 # ✅ Generate Empty PDF Functionality
 if operation == "Generate Empty PDF":
