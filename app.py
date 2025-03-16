@@ -112,8 +112,40 @@ if uploaded_files:
                 continue
 
             st.download_button(f"📥 Download {file_name}.pdf", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+# ✅ Split PDF Functionality
+elif operation == "Split PDF (1 to 2 PDFs)":
+    uploaded_pdf = uploaded_files[0]  # First uploaded PDF
+    pdf_reader = PdfReader(uploaded_pdf)
+    total_pages = len(pdf_reader.pages)
 
-    # ✅ Extract Pages from PDF
+    if total_pages > 1:
+        # ✅ Select the split point (User Input)
+        split_page = st.number_input("Enter the page number where you want to split:", min_value=1, max_value=total_pages-1, value=total_pages//2)
+
+        part1_writer, part2_writer = PdfWriter(), PdfWriter()
+
+        # ✅ First Part
+        for i in range(split_page):
+            part1_writer.add_page(pdf_reader.pages[i])
+
+        # ✅ Second Part
+        for i in range(split_page, total_pages):
+            part2_writer.add_page(pdf_reader.pages[i])
+
+        # ✅ Save Outputs
+        output1, output2 = BytesIO(), BytesIO()
+        part1_writer.write(output1)
+        part2_writer.write(output2)
+        output1.seek(0)
+        output2.seek(0)
+
+        # ✅ Download Buttons
+        st.download_button("📄 Download First Part", data=output1, file_name="Split_Part1.pdf", mime="application/pdf")
+        st.download_button("📄 Download Second Part", data=output2, file_name="Split_Part2.pdf", mime="application/pdf")
+
+    else:
+        st.error("❌ The PDF must have at least 2 pages to split.")
+# ✅ Extract Pages from PDF
     elif operation == "Extract Pages from PDF 🪓":
         pdf_reader = PdfReader(uploaded_files[0])
         pages_to_extract = st.text_input("Enter page numbers (comma-separated):")
