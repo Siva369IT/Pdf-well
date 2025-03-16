@@ -162,21 +162,27 @@ if uploaded_files:
         st.download_button("📥 Download Compressed PDF", data=output_pdf, file_name="Compressed_PDF.pdf", mime="application/pdf")
 
     # ✅ Insert Page Numbers
+    
+    # ✅ Insert Page Numbers
     elif operation == "Insert Page Numbers 📝 to PDF":
         pdf_reader = PdfReader(uploaded_files[0])
         pdf_writer = PdfWriter()
-        for i, page in enumerate(pdf_reader.pages):
-            page.add_annotation({
-                "subtype": "FreeText",
-                "rect": [500, 20, 580, 40],
-                "contents": f"Page {i+1}",
-                "color": (1, 0, 0)
-            })
-            pdf_writer.add_page(page)
         output_pdf = BytesIO()
+
+        for i, page in enumerate(pdf_reader.pages):
+            packet = BytesIO()
+            c = canvas.Canvas(packet, pagesize=letter)
+            c.setFont("Helvetica", 12)
+            c.drawString(500, 20, f"Page {i + 1}")
+            c.save()
+            packet.seek(0)
+            overlay_reader = PdfReader(packet)
+            page.merge_page(overlay_reader.pages[0])
+            pdf_writer.add_page(page)
+
         pdf_writer.write(output_pdf)
         output_pdf.seek(0)
-        st.download_button("📥 Download Numbered PDF", data=output_pdf, file_name="Numbered_PDF.pdf", mime="application/pdf")
+        st.download_button("📄 Download Numbered PDF", data=output_pdf, file_name="Numbered_PDF.pdf", mime="application/pdf")
 
 # ✅ Footer
 st.markdown('<div class="footer">© Pavan sri sai mondem |Siva satyamsetti |Uma satya mounika sapireddy |Bhuvaneswari Devi Seru | Chandu meela | Techwing Trainees 🧡 </div>', unsafe_allow_html=True)
