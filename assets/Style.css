@@ -66,3 +66,15 @@ div[data-testid="stFileUploader"] {
     padding: 15px;
     border-radius: 10px;
 }
+/* Fix copyright text at the bottom */
+.small-text {
+    font-size: 12px;
+    text-align: center;
+    color: #888;
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    background-color: #f4f4f4;
+    padding: 5px;
+    font-weight: bold;
+}
