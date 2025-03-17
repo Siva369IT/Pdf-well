@@ -100,7 +100,27 @@ if uploaded_files:
 
             output_pdf.seek(0)
             st.download_button(f"📥 Download {file_name}.pdf", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
+            
+    # ✅ Images to PDF (NEW FEATURE)
+    elif operation == "Images to PDF 🖼️📄":
+        st.subheader("📸 Convert Images to a Single PDF")
 
+        # ✅ Check if images are uploaded
+        image_files = [file for file in uploaded_files if file.name.split(".")[-1].lower() in ["png", "jpg", "jpeg"]]
+
+        if len(image_files) > 0:
+            output_pdf = BytesIO()
+
+            # ✅ Convert Images to a Single PDF
+            images = [Image.open(img).convert("RGB") for img in image_files]
+            images[0].save(output_pdf, format="PDF", save_all=True, append_images=images[1:])
+            output_pdf.seek(0)
+
+            st.success(f"✅ {len(image_files)} images combined into a single PDF!")
+            st.download_button("📥 Download Images PDF", data=output_pdf, file_name="Images_to_PDF.pdf", mime="application/pdf")
+
+        else:
+            st.error("❌ Please upload at least one image (PNG, JPG, JPEG).")
     # ✅ Extract Pages from PDF
     elif operation == "Extract Pages from PDF 🪓":
         pdf_reader = PdfReader(uploaded_files[0])
