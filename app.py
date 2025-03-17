@@ -121,7 +121,7 @@ if uploaded_files:
                 output_pdf.seek(0)
                 st.download_button("📄 Download Extracted PDF", data=output_pdf, file_name="Extracted_Pages.pdf", mime="application/pdf")
                 
-    elif operation == "Images to pdf 🏞️":
+    elif operation == "Images to PDF 🖼️📄":
     st.subheader("📸 Convert Images to a Single PDF")
 
     # ✅ Filter only image files
@@ -129,7 +129,7 @@ if uploaded_files:
 
     if len(image_files) > 0:
         output_pdf = BytesIO()
-        
+
         # ✅ Convert images to a single PDF
         images = [Image.open(img).convert("RGB") for img in image_files]
         if images:
@@ -137,7 +137,14 @@ if uploaded_files:
             output_pdf.seek(0)
 
             st.success(f"✅ {len(images)} images converted into a single PDF!")
-            st.download_button("📥 Download Images PDF", data=output_pdf, file_name="Images_to_PDF.pdf", mime="application/pdf")
+            
+            # ✅ Ensure Streamlit can read the file properly
+            st.download_button(
+                label="📥 Download Images PDF",
+                data=output_pdf.getvalue(),  # ✅ FIX: Use `getvalue()` to avoid empty files
+                file_name="Images_to_PDF.pdf",
+                mime="application/pdf"
+            )
         else:
             st.error("❌ No valid images found. Please upload PNG, JPG, or JPEG.")
     else:
