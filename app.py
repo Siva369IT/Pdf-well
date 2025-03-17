@@ -186,6 +186,21 @@ if uploaded_files:
         pdf_writer.write(output_pdf)
         output_pdf.seek(0)
         st.download_button("📄 Download Numbered PDF", data=output_pdf, file_name="Numbered_PDF.pdf", mime="application/pdf")
+    # ✅ Images to PDF
+    elif operation == "Images to pdf 🏞️":
+    st.subheader("🖼️ Convert Images to PDF")
+    if uploaded_files:
+        image_pdfs = BytesIO()
+        first_image = Image.open(uploaded_files[0]).convert("RGB")
+        other_images = [Image.open(img).convert("RGB") for img in uploaded_files[1:]]
+        
+        first_image.save(image_pdfs, format="PDF", save_all=True, append_images=other_images)
+        image_pdfs.seek(0)
+
+        st.success("✅ Images converted to PDF successfully!")
+        st.download_button("📥 Download PDF", data=image_pdfs, file_name="Images_to_PDF.pdf", mime="application/pdf")
+    else:
+        st.warning("⚠️ Please upload at least one image file!")
 
 # ✅ Footer
 st.markdown('<div class="footer">© Pavan sri sai mondem |Siva satyamsetti |Uma satya mounika sapireddy |Bhuvaneswari Devi Seru | Chandu meela | Techwing Trainees 🧡 </div>', unsafe_allow_html=True)
