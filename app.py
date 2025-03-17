@@ -120,8 +120,8 @@ if uploaded_files:
                 pdf_writer.write(output_pdf)
                 output_pdf.seek(0)
                 st.download_button("📄 Download Extracted PDF", data=output_pdf, file_name="Extracted_Pages.pdf", mime="application/pdf")
-    elif operation == "Images to PDF 🖼️📄":
-    st.subheader("📸 Convert Images to a Single PDF")
+        elif operation == "Images to PDF 🖼️📄":
+            st.subheader("📸 Convert Images to a Single PDF")
 
     # ✅ Filter only images
     image_files = [file for file in uploaded_files if file.name.lower().endswith(("png", "jpg", "jpeg"))]
