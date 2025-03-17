@@ -26,6 +26,7 @@ st.markdown('<p class="title">📄 PDF & File Converter</p>', unsafe_allow_html=
 operation = st.selectbox("Select an operation:", [
     "Generate Empty PDF 🖨️",
     "Convert Any File to PDF ♻️",
+    "Images to pdf 🏞️",
     "Extract Pages from PDF 🪓",
     "Merge PDFs 📄+📃",
     "Split PDF (1 to 2 📑 PDFs)",
