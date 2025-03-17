@@ -129,19 +129,6 @@ if uploaded_files:
 
     if len(image_files) > 0:
         output_pdf = BytesIO()
-
-        # ✅ Convert Images to a Single PDF
-        images = [Image.open(img).convert("RGB") for img in image_files]
-        if images:
-            images[0].save(output_pdf, format="PDF", save_all=True, append_images=images[1:])
-            output_pdf.seek(0)
-
-            st.success(f"✅ {len(images)} images combined into a single PDF!")
-            st.download_button("📥 Download Images PDF", data=output_pdf, file_name="Images_to_PDF.pdf", mime="application/pdf")
-        else:
-            st.error("❌ No valid images found. Please upload PNG, JPG, or JPEG.")
-    else:
-        st.error("❌ Please upload at least one image (PNG, JPG, JPEG).")
     # ✅ Merge PDFs
     elif operation == "Merge PDFs 📄+📃":
         pdf_writer = PdfWriter()
