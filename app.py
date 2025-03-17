@@ -36,7 +36,7 @@ operation = st.selectbox("Select an operation:", [
 # ✅ Generate Empty PDF
 if operation == "Generate Empty PDF 🖨️":
     st.subheader("📄 Generate an Empty PDF")
-    num_pages = st.number_input("Enter number of pages:", min_value=1, max_value=10000, value=1, step=1)
+    num_pages = st.number_input("Enter number of pages:", min_value=1, max_value=100000, value=1, step=1)
 
     if st.button("Generate an Empty PDF"):
         output_pdf = BytesIO()
