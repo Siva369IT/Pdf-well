@@ -165,8 +165,6 @@ if uploaded_files:
         st.download_button("📥 Download Compressed PDF", data=output_pdf, file_name="Compressed_PDF.pdf", mime="application/pdf")
 
     # ✅ Insert Page Numbers
-    
-    # ✅ Insert Page Numbers
     elif operation == "Insert Page Numbers 📝 to PDF":
         pdf_reader = PdfReader(uploaded_files[0])
         pdf_writer = PdfWriter()
