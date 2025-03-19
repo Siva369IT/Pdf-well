@@ -71,12 +71,6 @@ if operation == "Generate Empty PDF 🖨️":
         st.download_button("📥 Download Empty PDF", data=output_pdf, file_name="Empty_PDF.pdf", mime="application/pdf")
     st.stop()
 
-# ✅ File Upload
-uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "jpeg", "docx", "pptx", "txt"], accept_multiple_files=True, key="uploaded_files")
-
-if uploaded_files:
-    st.success(f"✅ {len(uploaded_files)} file(s) uploaded!")
-
     # ✅ Convert Any File to PDF
     if operation == "Convert Any File to PDF ♻️":
         st.subheader("🔄 Convert Any File to PDF")
