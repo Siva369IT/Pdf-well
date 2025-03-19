@@ -42,18 +42,6 @@ if st.session_state.previous_operation != operation:
     if 'uploaded_files' in st.session_state:
         st.session_state.uploaded_files = []
 
-# ✅ File Upload
-uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "jpeg", "txt", "docx", "pptx"], accept_multiple_files=True)
-if uploaded_files:
-    st.session_state.uploaded_files = uploaded_files
-    st.success(f"✅ {len(uploaded_files)} file(s) uploaded")
-
-# ✅ Remove button for clearing manually
-if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
-    if st.button("Remove Uploaded Files ❌"):
-        st.session_state.uploaded_files = []
-        st.success("✅ Uploaded files removed! Please choose another operation or upload again.")
-
 # ✅ Generate Empty PDF
 if operation == "Generate Empty PDF 🖨️":
     st.subheader("📄 Generate an Empty PDF")
@@ -70,7 +58,16 @@ if operation == "Generate Empty PDF 🖨️":
         st.success(f"✅ Empty PDF with {num_pages} pages generated!")
         st.download_button("📥 Download Empty PDF", data=output_pdf, file_name="Empty_PDF.pdf", mime="application/pdf")
     st.stop()
-
+# ✅ File Upload
+uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "jpeg", "txt", "docx", "pptx"], accept_multiple_files=True)
+if uploaded_files:
+    st.session_state.uploaded_files = uploaded_files
+    st.success(f"✅ {len(uploaded_files)} file(s) uploaded")
+# ✅ Remove button for clearing manually
+if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
+    if st.button("Remove Uploaded Files ❌"):
+        st.session_state.uploaded_files = []
+        st.success("✅ Uploaded files removed! Please choose another operation or upload again.")
     # ✅ Convert Any File to PDF
     if operation == "Convert Any File to PDF ♻️":
         st.subheader("🔄 Convert Any File to PDF")
