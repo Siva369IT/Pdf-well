@@ -24,6 +24,7 @@ st.markdown('<p class="title">📄 PDF & File Converter</p>', unsafe_allow_html=
 
 # --- Select Operation ---
 operation = st.selectbox("Select an operation:if you wanna remove uploaded files just click on generate empty pdf and select your option", [
+    "Clear All Uploaded Files ❌",
     "Generate Empty PDF 🖨️",
     "Convert Any File to PDF ♻️",
     "Images to pdf 🏞️",
@@ -33,7 +34,10 @@ operation = st.selectbox("Select an operation:if you wanna remove uploaded files
     "Compress PDF 📉",
     "Insert Page Numbers 📝 to PDF"
 ])
-
+if operation == "Clear All Uploaded Files ❌":
+    st.session_state.uploaded_files = []
+    st.success("✅ All uploaded files have been cleared!")
+    st.stop()  # Stop execution so user can select another operation
 if "last_operation" not in st.session_state:
     st.session_state.last_operation = operation
 
