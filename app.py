@@ -62,12 +62,27 @@ if operation == "Generate Empty PDF 🖨️":
 uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "jpeg", "txt", "docx", "pptx"], accept_multiple_files=True)
 if uploaded_files:
     st.session_state.uploaded_files = uploaded_files
-    st.success(f"✅ {len(uploaded_files)} file(s) uploaded")
-# ✅ Remove button for clearing manually
+# ✅ Remove uploaded files (selective or all)
 if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
-    if st.button("Remove Uploaded Files ❌"):
+    st.write("### Uploaded Files:")
+    uploaded_file_names = [file.name for file in st.session_state.uploaded_files]
+    
+    # Select All checkbox
+    select_all = st.checkbox("Select All Uploaded Files")
+    if select_all:
+        selected_files = st.multiselect("Select files to remove:", uploaded_file_names, default=uploaded_file_names)
+    else:
+        selected_files = st.multiselect("Select files to remove:", uploaded_file_names)
+
+    if st.button("Remove Selected Files ❌"):
+        st.session_state.uploaded_files = [
+            file for file in st.session_state.uploaded_files if file.name not in selected_files
+        ]
+        st.success(f"✅ Removed selected files: {', '.join(selected_files)}")
+        
+    if st.button("Remove All Uploaded Files ❌"):
         st.session_state.uploaded_files = []
-        st.success("✅ Uploaded files removed! Please choose another operation or upload again.")
+        st.success("✅ All uploaded files removed! Please upload again or select another operation.")
     # ✅ Convert Any File to PDF
     if operation == "Convert Any File to PDF ♻️":
         st.subheader("🔄 Convert Any File to PDF")
