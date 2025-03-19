@@ -54,22 +54,6 @@ if operation == "Generate Empty PDF 🖨️":
 uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "jpeg", "txt", "docx", "pptx"], accept_multiple_files=True)
 if uploaded_files:
     st.session_state.uploaded_files = uploaded_files
-# ✅ Remove uploaded files (selective or all)
-if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
-    st.write("### Uploaded Files:")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Remove All Uploaded Files ❌"):
-            st.session_state.uploaded_files = []
-            st.success("✅ All uploaded files removed! Please upload again or select another operation.")
-    with col2:
-        if st.button("Clear & Refresh 🔄"):
-            st.session_state.uploaded_files = []
-            st.success("✅ Cleared all uploaded files and refreshed!")
-            st.experimental_rerun()
-
-    uploaded_file_names = [file.name for file in st.session_state.uploaded_files]
     
     # ✅ Convert Any File to PDF
     if operation == "Convert Any File to PDF ♻️":
