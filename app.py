@@ -33,12 +33,14 @@ operation = st.selectbox("Select an operation:", [
     "Compress PDF 📉",
     "Insert Page Numbers 📝 to PDF"
 ])
+
 if "last_operation" not in st.session_state:
     st.session_state.last_operation = operation
 
 if st.session_state.last_operation != operation:
     st.session_state.uploaded_files = []
     st.session_state.last_operation = operation
+
 # ✅ Generate Empty PDF
 if operation == "Generate Empty PDF 🖨️":
     st.subheader("📄 Generate an Empty PDF")
@@ -55,11 +57,12 @@ if operation == "Generate Empty PDF 🖨️":
         st.success(f"✅ Empty PDF with {num_pages} pages generated!")
         st.download_button("📥 Download Empty PDF", data=output_pdf, file_name="Empty_PDF.pdf", mime="application/pdf")
     st.stop()
+
 # ✅ File Upload
 uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "jpeg", "txt", "docx", "pptx"], accept_multiple_files=True)
 if uploaded_files:
     st.session_state.uploaded_files = uploaded_files
-    
+
     # ✅ Convert Any File to PDF
     if operation == "Convert Any File to PDF ♻️":
         st.subheader("🔄 Convert Any File to PDF")
@@ -143,27 +146,27 @@ if uploaded_files:
         output_pdf.seek(0)
         st.download_button("📥 Download Merged PDF", data=output_pdf, file_name="Merged_PDF.pdf", mime="application/pdf")
 
-    # ✅ Split PDF
-elif operation == "Split PDF (1 to 2 📑 PDFs)":
-    pdf_reader = PdfReader(uploaded_files[0])
-    total_pages = len(pdf_reader.pages)
-    if total_pages <= 1:
-        st.error("❌ The PDF has only one page and cannot be split.")
-    else:
-        split_page = st.number_input("Enter the split page number:", min_value=1, max_value=total_pages - 1)
-        if st.button("Split PDF"):
-            part1_writer, part2_writer = PdfWriter(), PdfWriter()
-            for i in range(split_page):
-                part1_writer.add_page(pdf_reader.pages[i])
-            for i in range(split_page, total_pages):
-                part2_writer.add_page(pdf_reader.pages[i])
-            output1, output2 = BytesIO(), BytesIO()
-            part1_writer.write(output1)
-            part2_writer.write(output2)
-            output1.seek(0)
-            output2.seek(0)
-            st.download_button("📄 Download First Part", data=output1, file_name="Split_Part1.pdf", mime="application/pdf")
-            st.download_button("📄 Download Second Part", data=output2, file_name="Split_Part2.pdf", mime="application/pdf")
+    # ✅ Split PDF with check for single-page
+    elif operation == "Split PDF (1 to 2 📑 PDFs)":
+        pdf_reader = PdfReader(uploaded_files[0])
+        if len(pdf_reader.pages) <= 1:
+            st.warning("⚠️ Cannot split a single-page PDF.")
+        else:
+            split_page = st.number_input("Enter the split page number:", min_value=1, max_value=len(pdf_reader.pages) - 1)
+            if st.button("Split PDF"):
+                part1_writer, part2_writer = PdfWriter(), PdfWriter()
+                for i in range(split_page):
+                    part1_writer.add_page(pdf_reader.pages[i])
+                for i in range(split_page, len(pdf_reader.pages)):
+                    part2_writer.add_page(pdf_reader.pages[i])
+                output1, output2 = BytesIO(), BytesIO()
+                part1_writer.write(output1)
+                part2_writer.write(output2)
+                output1.seek(0)
+                output2.seek(0)
+                st.download_button("📄 Download First Part", data=output1, file_name="Split_Part1.pdf", mime="application/pdf")
+                st.download_button("📄 Download Second Part", data=output2, file_name="Split_Part2.pdf", mime="application/pdf")
+
     # ✅ Compress PDF
     elif operation == "Compress PDF 📉":
         pdf_reader = fitz.open(stream=uploaded_files[0].getvalue(), filetype="pdf")
