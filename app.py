@@ -33,7 +33,12 @@ operation = st.selectbox("Select an operation:", [
     "Compress PDF 📉",
     "Insert Page Numbers 📝 to PDF"
 ])
+if "last_operation" not in st.session_state:
+    st.session_state.last_operation = operation
 
+if st.session_state.last_operation != operation:
+    st.session_state.uploaded_files = []
+    st.session_state.last_operation = operation
 # ✅ Generate Empty PDF
 if operation == "Generate Empty PDF 🖨️":
     st.subheader("📄 Generate an Empty PDF")
