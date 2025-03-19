@@ -23,7 +23,7 @@ st.image("logo1.png", width=150)
 st.markdown('<p class="title">📄 PDF & File Converter</p>', unsafe_allow_html=True)
 
 # --- Select Operation ---
-operation = st.selectbox("Select an operation:if you wanna remove uploaded files just click on generate empty pdf and select your option", [
+operation = st.selectbox("Select an operation:", [
     "Clear All Uploaded Files ❌",
     "Generate Empty PDF 🖨️",
     "Convert Any File to PDF ♻️",
