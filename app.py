@@ -35,19 +35,24 @@ operation = st.selectbox("Select an operation:", [
 ])
 
 # ✅ Auto-clear uploaded files on operation change
-if "previous_operation" not in st.session_state:
+if 'previous_operation' not in st.session_state:
     st.session_state.previous_operation = operation
 if st.session_state.previous_operation != operation:
     st.session_state.previous_operation = operation
-    if "uploaded_files" in st.session_state:
-        del st.session_state.uploaded_files
+    if 'uploaded_files' in st.session_state:
+        st.session_state.uploaded_files = []
+
+# ✅ File Upload
+uploaded_files = st.file_uploader("Upload file(s)", type=["pdf", "png", "jpg", "jpeg", "txt", "docx", "pptx"], accept_multiple_files=True)
+if uploaded_files:
+    st.session_state.uploaded_files = uploaded_files
+    st.success(f"✅ {len(uploaded_files)} file(s) uploaded")
 
 # ✅ Remove button for clearing manually
-if "uploaded_files" in st.session_state:
-    if st.button("Remove Uploaded Files"):
+if 'uploaded_files' in st.session_state and st.session_state.uploaded_files:
+    if st.button("Remove Uploaded Files ❌"):
         st.session_state.uploaded_files = []
-        st.success("✅ Uploaded files removed! Please choose another operation.")
-        st.stop()
+        st.success("✅ Uploaded files removed! Please choose another operation or upload again.")
 
 # ✅ Generate Empty PDF
 if operation == "Generate Empty PDF 🖨️":
