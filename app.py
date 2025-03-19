@@ -144,14 +144,18 @@ if uploaded_files:
         st.download_button("📥 Download Merged PDF", data=output_pdf, file_name="Merged_PDF.pdf", mime="application/pdf")
 
     # ✅ Split PDF
-    elif operation == "Split PDF (1 to 2 📑 PDFs)":
-        pdf_reader = PdfReader(uploaded_files[0])
-        split_page = st.number_input("Enter the split page number:", min_value=1, max_value=len(pdf_reader.pages) - 1)
+elif operation == "Split PDF (1 to 2 📑 PDFs)":
+    pdf_reader = PdfReader(uploaded_files[0])
+    total_pages = len(pdf_reader.pages)
+    if total_pages <= 1:
+        st.error("❌ The PDF has only one page and cannot be split.")
+    else:
+        split_page = st.number_input("Enter the split page number:", min_value=1, max_value=total_pages - 1)
         if st.button("Split PDF"):
             part1_writer, part2_writer = PdfWriter(), PdfWriter()
             for i in range(split_page):
                 part1_writer.add_page(pdf_reader.pages[i])
-            for i in range(split_page, len(pdf_reader.pages)):
+            for i in range(split_page, total_pages):
                 part2_writer.add_page(pdf_reader.pages[i])
             output1, output2 = BytesIO(), BytesIO()
             part1_writer.write(output1)
@@ -160,7 +164,6 @@ if uploaded_files:
             output2.seek(0)
             st.download_button("📄 Download First Part", data=output1, file_name="Split_Part1.pdf", mime="application/pdf")
             st.download_button("📄 Download Second Part", data=output2, file_name="Split_Part2.pdf", mime="application/pdf")
-
     # ✅ Compress PDF
     elif operation == "Compress PDF 📉":
         pdf_reader = fitz.open(stream=uploaded_files[0].getvalue(), filetype="pdf")
