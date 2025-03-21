@@ -7,7 +7,6 @@ from pptx import Presentation
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import fitz  # PyMuPDF for PDF compression
-import os
 
 st.set_page_config(page_title="PDF & File Converter", layout="wide")
 
@@ -46,18 +45,17 @@ if operation == "Clear All Uploaded Files ❌":
     st.success("✅ All uploaded files cleared! Session reset.")
     st.stop()
 
-# ✅ File formats for each operation
+# ✅ Dynamic file formats & instructions
 file_formats = {
-    "Convert Any File to PDF ♻️": "Upload files to convert to PDF (png, jpg, jpeg, txt, docx, pptx):",
-    "Images to pdf 🏞️": "Upload images to convert to PDF (png, jpg, jpeg):",
+    "Convert Any File to PDF ♻️": "Upload files (png, jpg, jpeg, txt, docx, pptx):",
+    "Images to pdf 🏞️": "Upload images (png, jpg, jpeg):",
     "Extract Pages from PDF 🪓": "Upload a PDF to extract pages:",
     "Merge PDFs 📄+📃": "Upload multiple PDFs to merge:",
-    "Split PDF (1 to 2 📑 PDFs)": "Upload a PDF to split into two:",
+    "Split PDF (1 to 2 📑 PDFs)": "Upload a PDF to split:",
     "Compress PDF 📉": "Upload a PDF to compress:",
     "Insert Page Numbers 📝 to PDF": "Upload a PDF to insert page numbers:"
 }
 
-# ✅ Show uploader or warning
 if operation in file_formats:
     st.markdown(f"### {file_formats[operation]}")
 
@@ -80,10 +78,6 @@ if operation in file_formats:
     if uploaded_files:
         st.session_state.uploaded_files = uploaded_files
 
-elif operation not in ["Click me to see the operations -->", "Clear All Uploaded Files ❌", "Generate Empty PDF 🖨️"]:
-    st.warning("⚠️ Invalid operation or file format instructions not defined. Please select a valid option.")
-
-# ✅ OPERATIONS IMPLEMENTATION
 files = st.session_state.uploaded_files
 
 # ✅ Generate Empty PDF
@@ -140,24 +134,9 @@ if operation == "Convert Any File to PDF ♻️" and files:
         output_pdf.seek(0)
         st.download_button(f"📥 Download {file_name}.pdf", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
 
-# ✅ Images to PDF
-if operation == "Images to pdf 🏞️" and files:
-    st.subheader("🏞️ Convert Images to Single PDF")
-    image_files = [file for file in files if file.type.startswith("image/")]
-    if image_files:
-        if st.button("Convert Images"):
-            images = [Image.open(img).convert("RGB") for img in image_files]
-            output_pdf = BytesIO()
-            images[0].save(output_pdf, save_all=True, append_images=images[1:], format="PDF")
-            output_pdf.seek(0)
-            st.success("✅ Images converted successfully!")
-            st.download_button("📥 Download PDF", data=output_pdf, file_name="Images_Converted.pdf", mime="application/pdf")
-    else:
-        st.warning("⚠️ Please upload image files.")
-
 # ✅ Extract Pages from PDF
 if operation == "Extract Pages from PDF 🪓" and files:
-    pdf_reader = PdfReader(files[0])
+    pdf_reader = PdfReader(BytesIO(files[0].read()))
     pages = st.text_input("Enter page numbers (comma-separated):")
     if st.button("Extract"):
         if pages:
@@ -180,7 +159,7 @@ if operation == "Merge PDFs 📄+📃" and files:
     else:
         pdf_writer = PdfWriter()
         for file in files:
-            pdf_reader = PdfReader(file)
+            pdf_reader = PdfReader(BytesIO(file.read()))
             for page in pdf_reader.pages:
                 pdf_writer.add_page(page)
         output_pdf = BytesIO()
@@ -190,7 +169,7 @@ if operation == "Merge PDFs 📄+📃" and files:
 
 # ✅ Split PDF
 if operation == "Split PDF (1 to 2 📑 PDFs)" and files:
-    pdf_reader = PdfReader(files[0])
+    pdf_reader = PdfReader(BytesIO(files[0].read()))
     if len(pdf_reader.pages) <= 1:
         st.warning("⚠️ PDF has only one page, cannot split.")
     else:
@@ -211,7 +190,7 @@ if operation == "Split PDF (1 to 2 📑 PDFs)" and files:
 
 # ✅ Compress PDF
 if operation == "Compress PDF 📉" and files:
-    pdf_reader = fitz.open(stream=files[0].getvalue(), filetype="pdf")
+    pdf_reader = fitz.open(stream=files[0].read(), filetype="pdf")
     output_pdf = BytesIO()
     pdf_reader.save(output_pdf, garbage=4, deflate=True)
     output_pdf.seek(0)
@@ -219,7 +198,7 @@ if operation == "Compress PDF 📉" and files:
 
 # ✅ Insert Page Numbers
 if operation == "Insert Page Numbers 📝 to PDF" and files:
-    pdf_reader = PdfReader(files[0])
+    pdf_reader = PdfReader(BytesIO(files[0].read()))
     pdf_writer = PdfWriter()
     for i, page in enumerate(pdf_reader.pages):
         overlay = BytesIO()
