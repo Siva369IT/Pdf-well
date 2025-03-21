@@ -40,31 +40,15 @@ operation = st.selectbox("Select an operation:", [
     "Insert Page Numbers 📝 to PDF"
 ])
 
-# ✅ Clear uploaded files
+# ✅ Clear uploaded files with a single click
 if operation == "Clear All Uploaded Files ❌":
-    st.session_state.uploaded_files = []
-    st.success("✅ All uploaded files cleared!")
-    st.stop()
+    # Clear the session state and reset the file upload state
+    st.session_state.clear()  # This clears the session state
+    st.success("✅ All uploaded files cleared! Session reset.")
+    st.stop()  # Stop further execution to ensure no further operations are processed
 
-# ✅ Generate Empty PDF
-if operation == "Generate Empty PDF 🖨️":
-    st.subheader("📄 Generate an Empty PDF")
-    num_pages = st.number_input("Enter number of pages:", min_value=1, max_value=1000, value=1, step=1)
-    if st.button("Generate Empty PDF"):
-        output_pdf = BytesIO()
-        pdf_canvas = canvas.Canvas(output_pdf, pagesize=letter)
-        pdf_canvas.setFont("Helvetica", 12)
-        for i in range(num_pages):
-            pdf_canvas.drawString(100, 750, f"Page {i + 1}")
-            pdf_canvas.showPage()
-        pdf_canvas.save()
-        output_pdf.seek(0)
-        st.success(f"✅ Empty PDF with {num_pages} pages generated!")
-        st.download_button("📥 Download Empty PDF", data=output_pdf, file_name="Empty_PDF.pdf", mime="application/pdf")
-    st.stop()
-
-# ✅ Dynamic upload label based on operation
-upload_labels = {
+# ✅ File formats for each operation
+file_formats = {
     "Convert Any File to PDF ♻️": "Upload files to convert to PDF (png, jpg, jpeg, txt, docx, pptx):",
     "Images to pdf 🏞️": "Upload images to convert to PDF (png, jpg, jpeg):",
     "Extract Pages from PDF 🪓": "Upload a PDF to extract pages:",
@@ -75,14 +59,29 @@ upload_labels = {
 }
 
 # ✅ Show uploader only if operation selected
-if operation in upload_labels:
-    uploaded_files = st.file_uploader(upload_labels[operation],
-                                       type=["pdf", "png", "jpg", "jpeg", "txt", "docx", "pptx"],
-                                       accept_multiple_files=True if operation == "Merge PDFs 📄+📃" or operation == "Convert Any File to PDF ♻️" or operation == "Images to pdf 🏞️" else False)
+if operation in file_formats:
+    st.markdown(f"### {file_formats[operation]}")
+
+    file_types = {
+        "Convert Any File to PDF ♻️": ["pdf", "png", "jpg", "jpeg", "txt", "docx", "pptx"],
+        "Images to pdf 🏞️": ["png", "jpg", "jpeg"],
+        "Extract Pages from PDF 🪓": ["pdf"],
+        "Merge PDFs 📄+📃": ["pdf"],
+        "Split PDF (1 to 2 📑 PDFs)": ["pdf"],
+        "Compress PDF 📉": ["pdf"],
+        "Insert Page Numbers 📝 to PDF": ["pdf"]
+    }
+
+    uploaded_files = st.file_uploader(
+        "Upload files",
+        type=file_types.get(operation, []),
+        accept_multiple_files=True if operation in ["Merge PDFs 📄+📃", "Convert Any File to PDF ♻️", "Images to pdf 🏞️"] else False
+    )
+
     if uploaded_files:
         st.session_state.uploaded_files = uploaded_files
 
-# ✅ OPERATIONS IMPLEMENTATION:
+# ✅ OPERATIONS IMPLEMENTATION
 files = st.session_state.uploaded_files
 
 # ✅ Convert Any File to PDF
@@ -221,3 +220,4 @@ if operation == "Insert Page Numbers 📝 to PDF" and files:
 
 # ✅ Footer
 st.markdown('<div class="footer">© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satya Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Techwing Trainees 🧡</div>', unsafe_allow_html=True)
+
