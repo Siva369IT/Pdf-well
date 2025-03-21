@@ -42,10 +42,9 @@ operation = st.selectbox("Select an operation:", [
 
 # ✅ Clear uploaded files with a single click
 if operation == "Clear All Uploaded Files ❌":
-    # Clear the session state and reset the file upload state
-    st.session_state.clear()  # This clears the session state
+    st.session_state.clear()
     st.success("✅ All uploaded files cleared! Session reset.")
-    st.stop()  # Stop further execution to ensure no further operations are processed
+    st.stop()
 
 # ✅ File formats for each operation
 file_formats = {
@@ -58,7 +57,7 @@ file_formats = {
     "Insert Page Numbers 📝 to PDF": "Upload a PDF to insert page numbers:"
 }
 
-# ✅ Show uploader only if operation selected
+# ✅ Show uploader or warning
 if operation in file_formats:
     st.markdown(f"### {file_formats[operation]}")
 
@@ -81,8 +80,26 @@ if operation in file_formats:
     if uploaded_files:
         st.session_state.uploaded_files = uploaded_files
 
+elif operation not in ["Click me to see the operations -->", "Clear All Uploaded Files ❌", "Generate Empty PDF 🖨️"]:
+    st.warning("⚠️ Invalid operation or file format instructions not defined. Please select a valid option.")
+
 # ✅ OPERATIONS IMPLEMENTATION
 files = st.session_state.uploaded_files
+
+# ✅ Generate Empty PDF
+if operation == "Generate Empty PDF 🖨️":
+    st.subheader("📃 Create an Empty PDF")
+    total_pages = st.number_input("Enter number of pages:", min_value=1, max_value=100, value=1)
+    if st.button("Generate Empty PDF"):
+        output_pdf = BytesIO()
+        c = canvas.Canvas(output_pdf, pagesize=letter)
+        for page_num in range(1, total_pages + 1):
+            c.drawString(300, 500, f"Page {page_num}")
+            c.showPage()
+        c.save()
+        output_pdf.seek(0)
+        st.success("✅ Empty PDF generated successfully!")
+        st.download_button("📥 Download Empty PDF", data=output_pdf, file_name="Empty_PDF.pdf", mime="application/pdf")
 
 # ✅ Convert Any File to PDF
 if operation == "Convert Any File to PDF ♻️" and files:
@@ -118,7 +135,7 @@ if operation == "Convert Any File to PDF ♻️" and files:
                         pdf_canvas.showPage()
             pdf_canvas.save()
         else:
-            st.error(f"Unsupported file type: {ext}")
+            st.error(f"❗ Unsupported file type: {ext}")
             continue
         output_pdf.seek(0)
         st.download_button(f"📥 Download {file_name}.pdf", data=output_pdf, file_name=f"{file_name}.pdf", mime="application/pdf")
@@ -220,4 +237,3 @@ if operation == "Insert Page Numbers 📝 to PDF" and files:
 
 # ✅ Footer
 st.markdown('<div class="footer">© Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satya Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Techwing Trainees 🧡</div>', unsafe_allow_html=True)
-
