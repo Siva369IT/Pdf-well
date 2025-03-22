@@ -11,7 +11,7 @@ from pptx import Presentation
 import zipfile
 
 st.set_page_config(page_title="PDF & File Converter", layout="centered")
-st.image("logo1.png", use_container_width=True)
+st.markdown('<img src="logo1.png" style="position: absolute; top: 10px; left: 10px; width: 40px;">', unsafe_allow_html=True)
 st.title("PDF & File Converter App")
 
 operation = st.selectbox(
