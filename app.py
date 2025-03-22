@@ -87,7 +87,7 @@ if operation == "Generate Empty PDF 🖨️":
         output = BytesIO()
         c = canvas.Canvas(output, pagesize=letter)
         for p in range(pages):
-            c.drawString(300, 500, f"Page {p + 1}")
+            c.drawString(281, 20, f"Page {p + 1}")
             c.showPage()
         c.save()
         output.seek(0)
