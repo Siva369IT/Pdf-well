@@ -25,7 +25,7 @@ operation = st.selectbox(
         "Compress PDF",
         "Insert Page Numbers",
         "Images to PDF",
-        "Remove Uploaded Files"
+        " ❌ Remove this feature not available now"
     )
 )
 
@@ -253,7 +253,7 @@ elif operation == "Images to PDF" and uploaded_files:
 
 # Remove all
 elif operation == "Remove Uploaded Files":
-    st.experimental_rerun()
+    st.stop()
 
 # Footer at the bottom
 st.markdown(
