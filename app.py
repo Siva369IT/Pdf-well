@@ -17,6 +17,7 @@ st.title("PDF & File Converter App")
 operation = st.selectbox(
     "Choose an Operation",
     (
+        "Click here to choose 💚"
         "Generate Empty PDF",
         "Convert Any File to PDF",
         "Extract Pages from PDF",
