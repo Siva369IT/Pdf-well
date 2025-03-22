@@ -1,9 +1,8 @@
 streamlit
 PyPDF2
+fpdf
 Pillow
 python-docx
-python-pptx
-reportlab
-PyMuPDF
-fpdf
 docx2pdf
+comtypes
+PyMuPDF
