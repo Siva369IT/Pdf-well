@@ -11,7 +11,7 @@ from pptx import Presentation
 import zipfile
 
 st.set_page_config(page_title="PDF & File Converter", layout="centered")
-st.markdown('<img src="logo1.png" style="position: fixed; top: 10px; left: 10px; width: 70px; max-width: 20%; height: auto;">', unsafe_allow_html=True)
+st.image("logo1.png", use_container_width=True)
 st.title("PDF & File Converter App")
 
 operation = st.selectbox(
@@ -258,10 +258,8 @@ elif operation == "Remove Uploaded Files":
 
 # Footer at the bottom
 st.markdown(
-    """<div style="position: fixed; bottom: 0; width: 100%; text-align: center; font-size: small; color: gray;">
+    """<div style="position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: small; color: gray;">
     © 2025 Pavan SriSai Mondem | Siva Satyamsetti | Uma Satya Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Trainees from techwing 🧡
-
-    
     </div>""",
     unsafe_allow_html=True
 )
