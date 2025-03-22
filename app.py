@@ -25,7 +25,7 @@ operation = st.selectbox(
         "Compress PDF",
         "Insert Page Numbers",
         "Images to PDF",
-        " ❌ Remove this feature not available now"
+        "Remove uploaded files "
     )
 )
 
