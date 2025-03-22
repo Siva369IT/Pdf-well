@@ -61,7 +61,7 @@ if uploaded_files:
 if st.session_state.uploaded_files:
     if st.button("❌ Remove Uploaded Files"):
         st.session_state.uploaded_files = []
-        st.experimental_rerun()
+        st.stop()
 
 # ✅ Generate Empty PDF
 if operation == "Generate Empty PDF 🖨️":
