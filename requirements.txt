@@ -7,4 +7,3 @@ reportlab
 PyMuPDF
 fpdf
 docx2pdf
-pdfcompressor
