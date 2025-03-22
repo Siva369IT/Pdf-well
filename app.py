@@ -1,16 +1,18 @@
 import streamlit as st
-import os
-import io
-import zipfile
-from fpdf import FPDF
 from PyPDF2 import PdfReader, PdfWriter
+from fpdf import FPDF
+import zipfile
+import os
+from io import BytesIO
 from PIL import Image
-from docx2pdf import convert as docx2pdf_convert
-from pptx import Presentation
-from datetime import datetime
+from docx2pdf import convert as convert_docx
+import pptx
+import tempfile
+import shutil
 
-st.set_page_config(page_title="PDF & File Converter", layout="wide")
-st.title("💚 PDF & File Converter Web App")
+st.set_page_config(page_title="PDF & File Converter 💚", layout="centered")
+
+st.markdown("<h1 style='text-align: center; color: green;'>PDF & File Converter 💚</h1>", unsafe_allow_html=True)
 
 file_formats = {
     "Generate Empty PDF 📄": [],
@@ -23,175 +25,226 @@ file_formats = {
     "Images to PDF 🖼️": ["png", "jpg", "jpeg"]
 }
 
-uploaded_files = []
+if 'last_operation' not in st.session_state:
+    st.session_state.last_operation = ""
+if 'uploaded_files' not in st.session_state:
+    st.session_state.uploaded_files = []
 
-def check_uploaded_files(files, allowed_extensions):
-    if not files:
-        st.warning("Please upload at least one file.")
-        return False
-    invalid_files = [f.name for f in files if not any(f.name.lower().endswith(ext) for ext in allowed_extensions)]
-    if invalid_files:
-        st.error(f"Unsupported file format: {', '.join(invalid_files)}.\n\nAllowed: {', '.join(allowed_extensions)}")
-        return False
-    return True
+def clear_uploaded_files():
+    st.session_state.uploaded_files = []
 
-def save_pdf(output_writer, output_name):
-    output_buffer = io.BytesIO()
-    output_writer.write(output_buffer)
-    output_buffer.seek(0)
-    st.download_button(f"Download {output_name}", output_buffer, file_name=output_name, mime="application/pdf")
+operation = st.selectbox("Select Operation:", list(file_formats.keys()))
+if operation != st.session_state.last_operation:
+    clear_uploaded_files()
+    st.session_state.last_operation = operation
 
-operation = st.selectbox("**Select an Operation:**", list(file_formats.keys()))
+if file_formats[operation]:
+    st.info(f"Upload only: {', '.join(file_formats[operation])} files")
 
-if operation:
-    allowed = file_formats[operation]
-    if allowed:
-        st.info(f"Allowed file formats: {', '.join(allowed)}")
-        uploaded_files = st.file_uploader("Upload Files", type=allowed, accept_multiple_files=True)
-    elif operation != "Generate Empty PDF 📄":
-        st.warning("No files required for this operation.")
+if operation == "Generate Empty PDF 📄":
+    pages = st.number_input("Number of pages:", min_value=1, max_value=1369, value=1)
+    if st.button("Generate PDF"):
+        pdf = FPDF()
+        for i in range(pages):
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 10, txt=f"Page {i+1}", ln=True, align="C")
+        output = BytesIO()
+        pdf.output(output)
+        output.seek(0)
+        st.download_button("Download Empty PDF", data=output, file_name="empty.pdf")
 
-    if uploaded_files and not check_uploaded_files(uploaded_files, allowed):
-        uploaded_files = []
+else:
+    files = st.file_uploader("Upload files:", type=file_formats[operation], accept_multiple_files=True)
+    if files:
+        st.session_state.uploaded_files = files
 
-    if uploaded_files or operation == "Generate Empty PDF 📄":
-        custom_filename = st.text_input("Enter custom file name (without extension)", "output")
-        if st.button("Process"):
-            try:
-                if operation == "Generate Empty PDF 📄":
+def save_temp_files(uploaded_files):
+    temp_dir = tempfile.mkdtemp()
+    saved_files = []
+    for file in uploaded_files:
+        path = os.path.join(temp_dir, file.name)
+        with open(path, "wb") as f:
+            f.write(file.getvalue())
+        saved_files.append(path)
+    return saved_files, temp_dir
+
+# Convert Any File to PDF
+if operation == "Convert Any File to PDF 🔄" and st.session_state.uploaded_files:
+    if st.button("Convert"):
+        try:
+            files, temp_dir = save_temp_files(st.session_state.uploaded_files)
+            pdf_files = []
+            for file_path in files:
+                ext = file_path.split(".")[-1].lower()
+                if ext == "txt":
                     pdf = FPDF()
-                    for i in range(1, 6):
-                        pdf.add_page()
-                        pdf.set_font("Arial", size=24)
-                        pdf.cell(200, 100, txt=f"Page {i}", ln=True, align="C")
-                    pdf_output = pdf.output(dest="S").encode("latin-1")
-                    st.download_button("Download Empty PDF", data=pdf_output, file_name=f"{custom_filename}.pdf", mime="application/pdf")
-
-                elif operation == "Convert Any File to PDF 🔄":
-                    zip_buffer = io.BytesIO()
-                    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
-                        for file in uploaded_files:
-                            ext = file.name.split(".")[-1].lower()
-                            pdf_writer = PdfWriter()
-                            if ext == "txt":
-                                content = file.read().decode()
-                                pdf = FPDF()
-                                pdf.add_page()
-                                pdf.set_font("Arial", size=12)
-                                pdf.multi_cell(0, 10, content)
-                                pdf_stream = io.BytesIO(pdf.output(dest="S").encode("latin-1"))
-                                zip_file.writestr(f"{file.name}.pdf", pdf_stream.getvalue())
-                            elif ext == "docx":
-                                doc_path = f"{file.name}"
-                                with open(doc_path, "wb") as f:
-                                    f.write(file.getvalue())
-                                out_path = f"{file.name}.pdf"
-                                docx2pdf_convert(doc_path, out_path)
-                                with open(out_path, "rb") as f:
-                                    zip_file.writestr(f"{file.name}.pdf", f.read())
-                                os.remove(doc_path)
-                                os.remove(out_path)
-                            elif ext == "pptx":
-                                prs = Presentation(io.BytesIO(file.getvalue()))
-                                pdf = FPDF()
-                                for slide in prs.slides:
-                                    pdf.add_page()
-                                    pdf.set_font("Arial", size=16)
-                                    text = ""
-                                    for shape in slide.shapes:
-                                        if hasattr(shape, "text"):
-                                            text += shape.text + "\n"
-                                    pdf.multi_cell(0, 10, text.strip())
-                                pdf_stream = io.BytesIO(pdf.output(dest="S").encode("latin-1"))
-                                zip_file.writestr(f"{file.name}.pdf", pdf_stream.getvalue())
-                            elif ext in ["png", "jpg", "jpeg"]:
-                                image = Image.open(file)
-                                pdf = FPDF(unit="pt", format=image.size)
-                                pdf.add_page()
-                                img_buffer = io.BytesIO()
-                                image.save(img_buffer, format="PNG")
-                                img_buffer.seek(0)
-                                pdf.image(img_buffer, 0, 0)
-                                pdf_stream = io.BytesIO(pdf.output(dest="S").encode("latin-1"))
-                                zip_file.writestr(f"{file.name}.pdf", pdf_stream.getvalue())
-                    zip_buffer.seek(0)
-                    st.download_button("Download All PDFs (ZIP)", zip_buffer, file_name=f"{custom_filename}.zip")
-
-                elif operation == "Extract Pages from PDF 🪓":
-                    page_numbers = st.text_input("Enter page numbers to extract (comma-separated)", "1")
-                    if st.button("Extract"):
-                        pdf_reader = PdfReader(uploaded_files[0])
-                        output = PdfWriter()
-                        pages = [int(i.strip()) - 1 for i in page_numbers.split(",")]
-                        for p in pages:
-                            output.add_page(pdf_reader.pages[p])
-                        save_pdf(output, f"{custom_filename}.pdf")
-
-                elif operation == "Merge PDFs 📚":
-                    output = PdfWriter()
-                    for file in uploaded_files:
-                        reader = PdfReader(io.BytesIO(file.getvalue()))
-                        for page in reader.pages:
-                            output.add_page(page)
-                    save_pdf(output, f"{custom_filename}.pdf")
-
-                elif operation == "Split PDF ✂️":
-                    pdf_reader = PdfReader(io.BytesIO(uploaded_files[0].getvalue()))
-                    mid = len(pdf_reader.pages) // 2
-                    first_half = PdfWriter()
-                    second_half = PdfWriter()
-                    for i, page in enumerate(pdf_reader.pages):
-                        if i < mid:
-                            first_half.add_page(page)
-                        else:
-                            second_half.add_page(page)
-                    zip_buffer = io.BytesIO()
-                    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
-                        out1 = io.BytesIO()
-                        first_half.write(out1)
-                        zip_file.writestr(f"{custom_filename}_part1.pdf", out1.getvalue())
-                        out2 = io.BytesIO()
-                        second_half.write(out2)
-                        zip_file.writestr(f"{custom_filename}_part2.pdf", out2.getvalue())
-                    zip_buffer.seek(0)
-                    st.download_button("Download Split PDFs (ZIP)", zip_buffer, file_name=f"{custom_filename}.zip")
-
-                elif operation == "Compress PDF 📉":
-                    pdf_reader = PdfReader(io.BytesIO(uploaded_files[0].getvalue()))
-                    output = PdfWriter()
-                    for page in pdf_reader.pages:
-                        output.add_page(page)
-                    save_pdf(output, f"{custom_filename}.pdf")
-
-                elif operation == "Insert Page Numbers 📝 to PDF":
-                    reader = PdfReader(io.BytesIO(uploaded_files[0].getvalue()))
+                    pdf.add_page()
+                    pdf.set_font("Arial", size=12)
+                    with open(file_path, "r") as f:
+                        for line in f:
+                            pdf.multi_cell(0, 10, line)
+                    output_path = file_path.replace(ext, "pdf")
+                    pdf.output(output_path)
+                    pdf_files.append(output_path)
+                elif ext == "docx":
+                    output_path = file_path.replace(ext, "pdf")
+                    convert_docx(file_path, output_path)
+                    pdf_files.append(output_path)
+                elif ext == "pptx":
+                    prs = pptx.Presentation(file_path)
                     pdf = FPDF()
-                    for i, page in enumerate(reader.pages, start=1):
+                    for slide in prs.slides:
                         pdf.add_page()
+                        text = ""
+                        for shape in slide.shapes:
+                            if hasattr(shape, "text"):
+                                text += shape.text + "\n"
                         pdf.set_font("Arial", size=12)
-                        pdf.cell(0, 10, f"Page {i}", 0, 1, "C")
-                    pdf_output = pdf.output(dest="S").encode("latin-1")
-                    st.download_button("Download PDF with Page Numbers", pdf_output, file_name=f"{custom_filename}.pdf")
-
-                elif operation == "Images to PDF 🖼️":
+                        pdf.multi_cell(0, 10, text)
+                    output_path = file_path.replace(ext, "pdf")
+                    pdf.output(output_path)
+                    pdf_files.append(output_path)
+                elif ext in ["png", "jpg", "jpeg"]:
                     pdf = FPDF()
-                    for img in uploaded_files:
-                        image = Image.open(img)
-                        pdf.add_page()
-                        pdf.image(img, 0, 0, image.width / 2, image.height / 2)
-                    pdf_output = pdf.output(dest="S").encode("latin-1")
-                    st.download_button("Download Images to PDF", pdf_output, file_name=f"{custom_filename}.pdf")
+                    pdf.add_page()
+                    img = Image.open(file_path)
+                    img_path = os.path.join(temp_dir, "temp_img.jpg")
+                    img.save(img_path)
+                    pdf.image(img_path, x=10, y=10, w=180)
+                    output_path = file_path.replace(ext, "pdf")
+                    pdf.output(output_path)
+                    pdf_files.append(output_path)
+            zip_buf = BytesIO()
+            with zipfile.ZipFile(zip_buf, 'w') as zipf:
+                for pdf_file in pdf_files:
+                    zipf.write(pdf_file, arcname=os.path.basename(pdf_file))
+            zip_buf.seek(0)
+            st.download_button("Download All PDFs (ZIP)", zip_buf, "converted_files.zip")
+            shutil.rmtree(temp_dir)
+        except:
+            st.error("Error while converting. Please check files.")
 
-            except Exception as e:
-                st.error("An error occurred while processing. Please try again!")
+# Extract Pages
+if operation == "Extract Pages from PDF 🪓" and st.session_state.uploaded_files:
+    page_range = st.text_input("Enter pages (e.g., 1,3,5-8):")
+    if st.button("Extract"):
+        try:
+            for file in st.session_state.uploaded_files:
+                reader = PdfReader(file)
+                writer = PdfWriter()
+                pages = []
+                parts = page_range.split(",")
+                for part in parts:
+                    if "-" in part:
+                        start, end = map(int, part.split("-"))
+                        pages.extend(range(start, end+1))
+                    else:
+                        pages.append(int(part))
+                pages = [p - 1 for p in pages]
+                for p in pages:
+                    writer.add_page(reader.pages[p])
+                output = BytesIO()
+                writer.write(output)
+                output.seek(0)
+                st.download_button("Download Extracted PDF", output, file_name="extracted.pdf")
+        except:
+            st.error("Error during extraction.")
 
-    if uploaded_files:
-        if st.button("Remove Uploaded Files"):
-            uploaded_files.clear()
-            st.success("Files removed! You can upload new files now.")
+# Merge PDFs
+if operation == "Merge PDFs 📚" and st.session_state.uploaded_files:
+    if st.button("Merge PDFs"):
+        try:
+            writer = PdfWriter()
+            for file in st.session_state.uploaded_files:
+                writer.append(PdfReader(file))
+            output = BytesIO()
+            writer.write(output)
+            output.seek(0)
+            st.download_button("Download Merged PDF", output, file_name="merged.pdf")
+        except:
+            st.error("Merge error. Please try again.")
 
-st.markdown("---")
-st.markdown(
-    "<small>Developed with 💚 by Pavan Sri Sai Mondem, Siva Satyamsetti, Uma Satyam Mounika Sapireddy, Bhuvaneswari Devi Seru, Chandu Meela</small>",
-    unsafe_allow_html=True,
-                    )
+# Split PDF
+if operation == "Split PDF ✂️" and st.session_state.uploaded_files:
+    split_option = st.radio("Split Option:", ["Split each page into separate PDFs (ZIP)", "Split by fixed number of pages"])
+    if split_option == "Split by fixed number of pages":
+        split_size = st.number_input("Pages per split:", min_value=1, value=1)
+    if st.button("Split"):
+        try:
+            for file in st.session_state.uploaded_files:
+                reader = PdfReader(file)
+                if split_option == "Split each page into separate PDFs (ZIP)":
+                    zip_buf = BytesIO()
+                    with zipfile.ZipFile(zip_buf, "w") as zipf:
+                        for i, page in enumerate(reader.pages):
+                            writer = PdfWriter()
+                            writer.add_page(page)
+                            page_buf = BytesIO()
+                            writer.write(page_buf)
+                            page_buf.seek(0)
+                            zipf.writestr(f"page_{i+1}.pdf", page_buf.read())
+                    zip_buf.seek(0)
+                    st.download_button("Download ZIP of split pages", zip_buf, "split_pages.zip")
+                else:
+                    count = 0
+                    part_num = 1
+                    while count < len(reader.pages):
+                        writer = PdfWriter()
+                        for i in range(split_size):
+                            if count + i < len(reader.pages):
+                                writer.add_page(reader.pages[count+i])
+                        part_buf = BytesIO()
+                        writer.write(part_buf)
+                        part_buf.seek(0)
+                        st.download_button(f"Download Part {part_num}", part_buf, file_name=f"part_{part_num}.pdf")
+                        count += split_size
+                        part_num += 1
+        except:
+            st.error("Split error. Please check the file.")
+
+# Compress PDF
+if operation == "Compress PDF 📉" and st.session_state.uploaded_files:
+    if st.button("Compress PDF"):
+        for file in st.session_state.uploaded_files:
+            reader = PdfReader(file)
+            writer = PdfWriter()
+            for page in reader.pages:
+                writer.add_page(page)
+            output = BytesIO()
+            writer.write(output)
+            output.seek(0)
+            st.download_button("Download Compressed PDF", output, "compressed.pdf")
+
+# Insert Page Numbers
+if operation == "Insert Page Numbers 📝 to PDF" and st.session_state.uploaded_files:
+    if st.button("Insert Page Numbers"):
+        for file in st.session_state.uploaded_files:
+            reader = PdfReader(file)
+            pdf = FPDF()
+            for idx, page in enumerate(reader.pages):
+                pdf.add_page()
+                pdf.set_font("Arial", size=12)
+                pdf.cell(0, 10, txt=f"Page {idx+1}", ln=1, align="C")
+            output_buf = BytesIO()
+            pdf.output(output_buf)
+            output_buf.seek(0)
+            st.download_button("Download PDF with Page Numbers", output_buf, "paged.pdf")
+
+# Images to PDF
+if operation == "Images to PDF 🖼️" and st.session_state.uploaded_files:
+    if st.button("Create PDF from Images"):
+        pdf = FPDF()
+        for file in st.session_state.uploaded_files:
+            image = Image.open(file)
+            pdf.add_page()
+            img_path = os.path.join(tempfile.mkdtemp(), "temp.jpg")
+            image.save(img_path)
+            pdf.image(img_path, x=10, y=10, w=180)
+        output = BytesIO()
+        pdf.output(output)
+        output.seek(0)
+        st.download_button("Download Images PDF", output, "images.pdf")
+
+st.markdown("""<hr><small>Copyright © 2025  
+Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satyam Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela</small>""", unsafe_allow_html=True)
