@@ -13,27 +13,37 @@ import base64
 
 st.set_page_config(page_title="PDF & File Converter", layout="centered")
 st.image("logo1.png", use_container_width=True)
-import base64
-
-def set_background(png_file):
-    with open(png_file, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read())
+# ----------------- (4 lines before) ---
+def set_bg_from_url():
     st.markdown(
-        f"""
+        """
         <style>
-        .stApp {{
-            background-image: url("data:image/png;base64,{encoded_string.decode()}");
+        .stApp {
+            /* Replace this URL with your raw GitHub link */
+            background-image: url("https://raw.githubusercontent.com/Siva369IT/Pdf-well/main/bgimage.png");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-        }}
+        }
+        /* Mobile screens: auto-fit the image height */
+        @media (max-width: 768px) {
+            .stApp {
+                background-size: auto 100%;
+            }
+        }
         </style>
         """,
         unsafe_allow_html=True
     )
 
-set_background("logo1.png")
+set_bg_from_url()
+
+st.title("PDF & File Converter App")
+
+# ----------------- (4 lines after) -----------------
+
+# (Your existing Streamlit code continues below.
 st.title("PDF & File Converter App")
 
 operation = st.selectbox(
