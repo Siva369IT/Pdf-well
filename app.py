@@ -49,6 +49,7 @@ st.title("PDF & File Converter App")
 operation = st.selectbox(
     "Choose an Operation",
     (
+        "Click on me to see dropdown options 👇"
         "Generate Empty PDF",
         "Convert Any File to PDF",
         "Extract Pages from PDF",
@@ -71,7 +72,7 @@ elif operation == "Images to PDF":
 elif operation == "Generate Empty PDF":
     st.info("No file needed. Just enter number of pages.")
 else:
-    st.info("Remove all files with 'Remove Uploaded Files' option")
+    st.info("Welcome to pdf-world 💚")
 
 # Uploads
 if operation in ["Convert Any File to PDF", "Images to PDF"]:
