@@ -55,21 +55,24 @@ def download_button(file, file_name):
     st.download_button(label="Download", data=file, file_name=file_name, mime="application/pdf")
 
 # 1. Generate Empty PDF
-if operation == "Generate Empty PDF":
-    st.markdown("### Generate Empty PDF")
-    pages = st.number_input("Enter number of empty pages", min_value=1, step=1, value=1)
-    generate_btn = st.button("Generate PDF")
-    
-    if generate_btn:
-        buffer = BytesIO()
-        c = canvas.Canvas(buffer, pagesize=letter)
-        for page_number in range(pages):
-            c.drawString((612 - c.stringWidth(f"Page {page_number + 1}", "Helvetica", 10)) / 2, 30, f"Page {page_number + 1}")
-            c.showPage()
-        c.save()
-        buffer.seek(0)
-        st.download_button("Download Empty PDF", data=buffer, file_name="empty_pdf.pdf", mime="application/pdf")
-
+if selected_operation == "Generate Empty PDF":
+    st.subheader("Generate Empty PDF")
+    num_pages = st.number_input("Enter the number of pages to generate (max 500):", min_value=1, max_value=500, step=1)
+    if st.button("Generate"):
+        output_pdf = BytesIO()
+        pdf_writer = PdfWriter()
+        for _ in range(num_pages):
+            pdf_writer.add_blank_page(width=612, height=792)
+        pdf_writer.write(output_pdf)
+        output_pdf.seek(0)
+        st.success(f"Generated Empty PDF with {num_pages} pages.")
+        custom_name = st.text_input("Enter custom file name (without extension):", value="empty_pdf")
+        st.download_button(
+            label="Download Empty PDF",
+            data=output_pdf,
+            file_name=f"{custom_name}.pdf",
+            mime="application/pdf"
+        )
 # 2. Convert Any File to PDF (direct download)
 elif operation == "Convert Any File to PDF" and uploaded_files:
     for uploaded in uploaded_files:
