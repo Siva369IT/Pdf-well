@@ -201,7 +201,7 @@ elif operation == "Split PDF" and uploaded_file:
 
 # 6. Compress PDF
 elif operation == "Compress PDF" and uploaded_file:
-    compress_ratio = st.slider("Compression level", 1, 10, 5)
+    compress_ratio = st.slider("Compression level", 1, 100, 50)
     if st.button("Compress"):
         try:
             input_pdf = fitz.open(stream=uploaded_file.read(), filetype="pdf")
