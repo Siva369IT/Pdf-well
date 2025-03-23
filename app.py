@@ -207,6 +207,7 @@ elif operation == "Split PDF" and uploaded_file:
 
 # 6. Compress PDF
 elif operation == "Compress PDF" and uploaded_file:
+    st.info("Note: Compression depends on PDF content. Some files may not reduce in size.")
     compress_ratio = st.slider("Compression level", 1, 100, 50)
     if st.button("Compress"):
         try:
