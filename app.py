@@ -56,15 +56,19 @@ def download_button(file, file_name):
 
 # 1. Generate Empty PDF
 if operation == "Generate Empty PDF":
-    pages = st.number_input("Enter number of empty pages", min_value=1, step=1)
-    if st.button("Generate PDF"):
+    st.markdown("### Generate Empty PDF")
+    pages = st.number_input("Enter number of empty pages", min_value=1, step=1, value=1)
+    generate_btn = st.button("Generate PDF")
+    
+    if generate_btn:
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
-        for _ in range(pages):
+        for page_number in range(pages):
+            c.drawString((612 - c.stringWidth(f"Page {page_number + 1}", "Helvetica", 10)) / 2, 30, f"Page {page_number + 1}")
             c.showPage()
         c.save()
         buffer.seek(0)
-        download_button(buffer, "empty_pages.pdf")
+        st.download_button("Download Empty PDF", data=buffer, file_name="empty_pdf.pdf", mime="application/pdf")
 
 # 2. Convert Any File to PDF (direct download)
 elif operation == "Convert Any File to PDF" and uploaded_files:
