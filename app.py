@@ -17,7 +17,7 @@ st.title("PDF & File Converter App")
 operation = st.selectbox(
     "Choose an Operation",
     (
-        "Generate Empty PDF ",
+        "Generate Empty PDF",
         "Convert Any File to PDF",
         "Extract Pages from PDF",
         "Merge PDFs",
@@ -55,7 +55,7 @@ def download_button(file, file_name):
     st.download_button(label="Download", data=file, file_name=file_name, mime="application/pdf")
 
 # 1. Generate Empty PDF
-if selected_operation == "Generate Empty PDF":
+if operation == "Generate Empty PDF":
     st.subheader("Generate Empty PDF")
     num_pages = st.number_input("Enter the number of pages to generate (max 500):", min_value=1, max_value=500, step=1)
     if st.button("Generate"):
