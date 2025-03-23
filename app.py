@@ -207,7 +207,6 @@ elif operation == "Split PDF" and uploaded_file:
 
 # 6. Compress PDF
 elif operation == "Compress PDF" and uploaded_file:
-    st.info("Note: Compression depends on PDF content. Some files may not reduce in size.")
     compress_ratio = st.slider("Compression level", 1, 100, 50)
     if st.button("Compress"):
         try:
@@ -222,6 +221,7 @@ elif operation == "Compress PDF" and uploaded_file:
             output_pdf.save(output)
             output.seek(0)
             download_button(output, "compressed.pdf")
+            st.info("Note: Compression depends on PDF content. Some files may not reduce in size.")
         except Exception as e:
             st.error(f"Compression error: {e}")
 
