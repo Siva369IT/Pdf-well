@@ -11,7 +11,7 @@ from pptx import Presentation
 import zipfile
 import base64
 
-st.set_page_config(page_title="PDF & File Converter", layout="centered")
+st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 st.image("logo1.png", use_container_width=True)
 # ----------------- (4 lines before) ---
 def set_bg_from_url():
@@ -39,17 +39,19 @@ def set_bg_from_url():
 
 set_bg_from_url()
 
-st.title("PDF & File Converter App")
+
 
 # ----------------- (4 lines after) -----------------
 
 # (Your existing Streamlit code continues below.
+
+
 st.title("PDF & File Converter App")
 
 operation = st.selectbox(
     "Choose an Operation",
     (
-        "Click on me to see dropdown options 👇"
+        "Click here to choose 👇"
         "Generate Empty PDF",
         "Convert Any File to PDF",
         "Extract Pages from PDF",
