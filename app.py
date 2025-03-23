@@ -301,9 +301,8 @@ elif operation == "Remove Uploaded Files":
 
 # Footer at the bottom
 st.markdown(
-    """<div style="position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: small; color: gray;">
-    © 2025 Pavan SriSai Mondem | Siva Satyamsetti | Uma Satya Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Trainees from techwing                 🧡
-                
-                .</div>""",
+    """<div style="position: fixed; bottom: 40px; width: 100%; text-align: center; font-size: small; color: gray;">
+    © 2025 Pavan SriSai Mondem | Siva Satyamsetti | Uma Satya Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Trainees from techwing 🧡
+   </div>""",
     unsafe_allow_html=True
 )
