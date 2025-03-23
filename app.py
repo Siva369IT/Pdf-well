@@ -89,6 +89,7 @@ else:
 def download_button(file, file_name):
     st.download_button(label="Download", data=file, file_name=file_name, mime="application/pdf")
 
+
 # 1. Generate Empty PDF
 if operation == "Generate Empty PDF":
     st.subheader("Generate Empty PDF")
