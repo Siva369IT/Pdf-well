@@ -7,3 +7,4 @@ PyPDF2
 fpdf
 pillow
 python-pptx
+reportlab
