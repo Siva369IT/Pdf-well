@@ -10,7 +10,7 @@ from docx import Document
 from pptx import Presentation
 import zipfile
 import base64
-
+st.image("logo1.png", width=150)
 st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
 # Use a styled container for the logo
