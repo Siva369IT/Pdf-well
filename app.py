@@ -12,63 +12,35 @@ import zipfile
 import base64
 st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
-# Use a styled container for the logo
-st.markdown(
-    """
-    <style>
-        .logo-container img {
-            display: block;
-            margin: auto;
-            max-width: 250px; /* Limits logo size on PC */
-            height: auto;
-        }
+# Display the logo with auto-width adjustment
+st.image("logo1.png", use_container_width=True)
 
-        @media (max-width: 768px) {
-            .logo-container img {
-                width: 50%; /* Adjusts size for mobile */
-            }
-        }
-
+# Function to set background image from URL
+def set_bg_from_url():
+    st.markdown(
+        """
+        <style>
         .stApp {
+            /* Replace this URL with your raw GitHub link */
             background-image: url("https://raw.githubusercontent.com/Siva369IT/Pdf-well/main/bgimage.png");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
         }
-
+        /* Mobile screens: auto-fit the image height */
         @media (max-width: 768px) {
             .stApp {
                 background-size: auto 100%;
             }
         }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-        /* Footer Styling */
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 12px;
-            color: black;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 5px 0;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-# Apply the logo inside a div for styling control
-st.markdown('<div class="logo-container"><img src="logo1.png"></div>', unsafe_allow_html=True)
-
-# ----------------- (4 lines after) -----------------
-
-# (Your existing Streamlit code continues below.
-
-
-st.title("PDF & File Converter App")
-
+# Apply the background styling
+set_bg_from_url()
 operation = st.selectbox(
     "Choose an Operation",
     (
@@ -322,9 +294,11 @@ elif operation == "Remove Uploaded Files":
 
 # Footer at the bottom
 
-# Footer
 st.markdown(
-    '<div class="footer">© 2025 Pavan Sri Sai Mondem | Siva Satyamsetti | Uma Satya Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Trainees from techwing 🧡</div>',
-    unsafe_allow_html=True
-)
+"""<div style="position: fixed; bottom: 45px; width: 100%; text-align: center; font-size: small; color: #2F4F4F;">
+© 2025 Pavan SriSai Mondem | Siva Satyamsetti | Uma Satya Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Trainees from techwing 🧡
+
+   </div>""",  
+    unsafe_allow_html=True  
+)  
 
