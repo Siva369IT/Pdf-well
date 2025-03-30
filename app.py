@@ -12,39 +12,47 @@ import zipfile
 import base64
 st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
+import streamlit as st
+
+st.title("Live Scrolling News Ticker in Streamlit")
+
 # Predefined scrolling text
 ticker_text = "🚀 Breaking News: Streamlit now supports live news tickers! | 📢 Stay updated with real-time scrolling text! | 🎉 AI-powered apps are the future! | "
 
-# HTML, CSS & JS for scrolling effect
+# HTML + JavaScript for the scrolling ticker
 ticker_html = f"""
-<style>
-    .ticker-container {{
-        overflow: hidden;
-        background-color: #222;
-        color: white;
-        padding: 10px 0;
-        width: 100%;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        z-index: 1000;
-    }}
-    .ticker-text {{
-        display: inline-block;
-        white-space: nowrap;
-        animation: ticker-animation 15s linear infinite;
-        font-size: 20px;
-        font-weight: bold;
-        padding-left: 100%;
-    }}
-    @keyframes ticker-animation {{
-        from {{ transform: translateX(100%); }}
-        to {{ transform: translateX(-100%); }}
-    }}
-</style>
-<div class="ticker-container">
-    <div class="ticker-text">{ticker_text}</div>
-</div>
+<iframe width="100%" height="50" frameborder="0" scrolling="no" style="border:none; overflow:hidden;"
+srcdoc='
+    <style>
+        @keyframes ticker {{
+            from {{ transform: translateX(100%); }}
+            to {{ transform: translateX(-100%); }}
+        }}
+        .ticker-container {{
+            width: 100%;
+            overflow: hidden;
+            background: black;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            white-space: nowrap;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            padding: 10px 0;
+            z-index: 1000;
+        }}
+        .ticker-text {{
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 10s linear infinite;
+        }}
+    </style>
+    <div class="ticker-container">
+        <div class="ticker-text">{ticker_text}</div>
+    </div>
+'>
+</iframe>
 """
 
 # Display the moving ticker
