@@ -18,7 +18,7 @@ st.title("It's completely free like nature use it 💚")
 
 # Predefined scrolling text
 ticker_text = (
-    "💡 Transforming PDFs with ease—convert, merge, split, and more! | "
+    "💡  Transforming PDFs with ease—convert, merge, split, and more! | "
     "🎉 100% Free & Fast—No subscriptions, No limits! | "
     "📂 Upload, Process, Download—All in just a few clicks! | "
     "💚 Trusted by thousands—Join the community today! | "
