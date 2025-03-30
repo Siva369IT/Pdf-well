@@ -13,7 +13,7 @@ import base64
 st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
 # Display the logo with auto-width adjustment
-st.image("logo1.png", use_container_width=True)
+st.image("logo1.png", use_container_width=150)
 
 # Function to set background image from URL
 def set_bg_from_url():
@@ -295,21 +295,9 @@ elif operation == "Remove Uploaded Files":
 # Footer at the bottom
 
 st.markdown(
-    """<div style="
-            position: fixed; 
-            bottom: 45px; 
-            width: 100%; 
-            text-align: center; 
-            font-size: small; 
-            color: #2F4F4F;
-            display: block; 
-            white-space: normal; 
-            word-wrap: break-word;
-            padding: 5px;
-            background-color: rgba(255, 255, 255, 0.8);
-        ">
-    © 2025 Pavan SriSai Mondem | Siva Satyamsetti | Uma Satya Mounika Sapireddy | 
-    Bhuvaneswari Devi Seru | Chandu Meela | Trainees from TechWing 🧡
-    </div>""",
-    unsafe_allow_html=True
+"""<div style="position: fixed; bottom: 45px; width: 100%; text-align: center; font-size: small; color: #2F4F4F;">
+© 2025 Pavan SriSai Mondem | Siva Satyamsetti | Uma Satya Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Trainees from techwing 🧡
+
+   </div>""",  
+    unsafe_allow_html=True  
 )
