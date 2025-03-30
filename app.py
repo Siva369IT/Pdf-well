@@ -13,7 +13,7 @@ import base64
 st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
 # Display the logo with auto-width adjustment
-st.image("logo1.png", use_container_width=150)
+st.image("logo1.png", width=150)
 
 # Function to set background image from URL
 def set_bg_from_url():
