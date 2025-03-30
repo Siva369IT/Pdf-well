@@ -14,7 +14,7 @@ st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
 import streamlit as st
 
-st.title("its very free like nature use it 💚")
+st.title("It's completely free like nature use it 💚")
 
 # Predefined scrolling text
 ticker_text = (
@@ -39,7 +39,7 @@ srcdoc='
         .ticker-container {{
             width: 100%;
             overflow: hidden;
-            background: black;
+            background: #008000;
             color: white;
             font-size: 20px;
             font-weight: bold;
@@ -53,7 +53,7 @@ srcdoc='
         .ticker-text {{
             display: inline-block;
             padding-left: 100%;
-            animation: ticker 40s linear infinite;
+            animation: ticker 50s linear infinite;
         }}
     </style>
     <div class="ticker-container">
