@@ -18,8 +18,6 @@ st.title("It's completely free like nature use it 💚")
 
 # Predefined scrolling text
 ticker_text = (
-    "🚀 Developed with passion by Siva Satyamsetti | Uma Satya Mounika Sapireddy | "
-    "Pavan Srisai Mondem | Bhuvaneshwari Devi Seru | Chandu Meela | "
     "💡 Transforming PDFs with ease—convert, merge, split, and more! | "
     "🎉 100% Free & Fast—No subscriptions, No limits! | "
     "📂 Upload, Process, Download—All in just a few clicks! | "
