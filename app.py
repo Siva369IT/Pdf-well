@@ -53,7 +53,7 @@ srcdoc='
         .ticker-text {{
             display: inline-block;
             padding-left: 100%;
-            animation: ticker 10s linear infinite;
+            animation: ticker 40s linear infinite;
         }}
     </style>
     <div class="ticker-container">
