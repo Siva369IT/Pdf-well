@@ -14,7 +14,7 @@ st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
 import streamlit as st
 
-st.title("It's completely free like nature use it 💚")
+st.title("PDF-GENERATOR")
 
 # Predefined scrolling text
 ticker_text = (
