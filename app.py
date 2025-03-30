@@ -12,6 +12,43 @@ import zipfile
 import base64
 st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
+# Predefined scrolling text
+ticker_text = "🚀 Breaking News: Streamlit now supports live news tickers! | 📢 Stay updated with real-time scrolling text! | 🎉 AI-powered apps are the future! | "
+
+# HTML, CSS & JS for scrolling effect
+ticker_html = f"""
+<style>
+    .ticker-container {{
+        overflow: hidden;
+        background-color: #222;
+        color: white;
+        padding: 10px 0;
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+    }}
+    .ticker-text {{
+        display: inline-block;
+        white-space: nowrap;
+        animation: ticker-animation 15s linear infinite;
+        font-size: 20px;
+        font-weight: bold;
+        padding-left: 100%;
+    }}
+    @keyframes ticker-animation {{
+        from {{ transform: translateX(100%); }}
+        to {{ transform: translateX(-100%); }}
+    }}
+</style>
+<div class="ticker-container">
+    <div class="ticker-text">{ticker_text}</div>
+</div>
+"""
+
+# Display the moving ticker
+st.markdown(ticker_html, unsafe_allow_html=True)
 # Display the logo with auto-width adjustment
 st.image("logo1.png", width=150)
 
