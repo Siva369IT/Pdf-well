@@ -14,10 +14,16 @@ st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
 import streamlit as st
 
-st.title("Live Scrolling News Ticker in Streamlit")
+st.title("its very free like nature use it 💚")
 
 # Predefined scrolling text
-ticker_text = "🚀 Breaking News: Streamlit now supports live news tickers! | 📢 Stay updated with real-time scrolling text! | 🎉 AI-powered apps are the future! | "
+ticker_text = "🚀 Developed with passion by Siva Satyamsetti |Uma satya mounika sapireddy | Pavan srisai mondem | bhuvaneshwari devi seru | chandu meela | "
+    "💡 Transforming PDFs with ease—convert, merge, split, and more! | "
+    "🎉 100% Free & Fast—No subscriptions, No limits! | "
+    "📂 Upload, Process, Download—All in just a few clicks! | "
+    "💚 Trusted by thousands—Join the community today! | "
+    "🔗 Streamlit-powered for smooth and secure file handling! | "
+    "📢 Stay tuned for exciting updates & new features! |  | "
 
 # HTML + JavaScript for the scrolling ticker
 ticker_html = f"""
