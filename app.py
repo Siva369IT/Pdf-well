@@ -150,7 +150,6 @@ if operation == "Generate Empty PDF":
         )
 # 2. Convert Any File to PDF (direct download)
 elif operation == "Convert Any File to PDF" and uploaded_files:
-    st.subheader("Convert Any File to PDF")
     for uploaded in uploaded_files:
         filename = uploaded.name
         file_bytes = uploaded.read()
@@ -207,7 +206,6 @@ elif operation == "Convert Any File to PDF" and uploaded_files:
 
 # 3. Extract Pages
 elif operation == "Extract Pages from PDF" and uploaded_file:
-    st.subheader("Extract Pages from PDF")
     page_input = st.text_input("Enter page numbers or ranges (e.g., 1,3,5-8):")
     if st.button("Extract Pages"):
         try:
@@ -236,7 +234,6 @@ elif operation == "Extract Pages from PDF" and uploaded_file:
 
 # 4. Merge PDFs
 elif operation == "Merge PDFs" and uploaded_files:
-    st.subheader("Merge PDFs")
     if len(uploaded_files) == 2:
         merger = PdfWriter()
         for pdf in uploaded_files:
@@ -250,7 +247,6 @@ elif operation == "Merge PDFs" and uploaded_files:
 
 # 5. Split PDF
 elif operation == "Split PDF" and uploaded_file:
-    st.subheader("Split PDF")
     reader = PdfReader(uploaded_file)
     choice = st.radio("Choose split method:", ("Custom Split", "Split Each Page"))
     if choice == "Custom Split":
@@ -287,7 +283,6 @@ elif operation == "Split PDF" and uploaded_file:
 
 # 6. Compress PDF
 elif operation == "Compress PDF" and uploaded_file:
-    st.subheader("Compress PDF")
     compress_ratio = st.slider("Compression level", 1, 100, 50)
     if st.button("Compress"):
         try:
@@ -308,7 +303,6 @@ elif operation == "Compress PDF" and uploaded_file:
 
 # 7. Insert Page Numbers
 elif operation == "Insert Page Numbers" and uploaded_file:
-    st.subheader("Insert Page Numbers")
     if st.button("Insert Page Numbers"):
         try:
             reader = PdfReader(uploaded_file)
@@ -331,7 +325,6 @@ elif operation == "Insert Page Numbers" and uploaded_file:
 
 # 8. Images to PDF
 elif operation == "Images to PDF" and uploaded_files:
-    st.subheader("Images to PDF")
     if st.button("Convert Images to Single PDF"):
         try:
             images = [Image.open(f).convert("RGB") for f in uploaded_files]
