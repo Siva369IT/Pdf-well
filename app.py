@@ -12,8 +12,6 @@ import zipfile
 import base64
 st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
-import streamlit as st
-
 st.title("PDF-GENERATOR")
 
 # Predefined scrolling text
