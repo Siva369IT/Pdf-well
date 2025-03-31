@@ -132,7 +132,7 @@ def download_button(file, file_name):
 # 1. Generate Empty PDF
 if operation == "Generate Empty PDF":
     st.subheader("Generate Empty PDF")
-    num_pages = st.number_input("Enter the number of pages to generate (max 500):", min_value=1, max_value=500, step=1)
+    num_pages = st.number_input("Enter the number of pages to generate (max 3690):", min_value=1, max_value=3690, step=1)
     if st.button("Generate"):
         output_pdf = BytesIO()
         pdf_writer = PdfWriter()
