@@ -11,8 +11,6 @@ from pptx import Presentation
 import zipfile
 import base64
 st.title("PDF-GENERATOR")
-st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
-
 # Predefined scrolling text
 ticker_text = (
     "💡  Transforming PDFs with ease—convert, merge, split, and more! | "
