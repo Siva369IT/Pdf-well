@@ -12,7 +12,7 @@ import zipfile
 import base64
 st.set_page_config(page_title="📄 PDF & Files Converter", layout="centered")
 
-st.title("PDF-GENERATOR")
+#st.title("PDF-GENERATOR")
 
 # Predefined scrolling text
 ticker_text = (
