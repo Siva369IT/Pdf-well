@@ -64,13 +64,8 @@ Combine multiple images into a single PDF with one image per page.
 
 9. 🧹 Remove Uploaded Files
 
-Clear all uploaded files safely without reloading the app.
+Clear all uploaded files safely without reloading the app
 
-
-
-
-
----
 
 📱 Mobile-Friendly Design
 
@@ -87,30 +82,13 @@ Backend: Python
 
 Libraries: PyMuPDF, ReportLab, python-docx, python-pptx, Pillow, PyPDF2, base64, zipfile
 
-
-
----
-
-📂 How to Run
+📂 How to Run:
 
 pip install -r requirements.txt
 streamlit run app.py
 
 ✅ No file is stored on the server. Everything is processed instantly and securely.
 
-
----
-
-👨‍💻 Credits
-
-Built with ❤️ by:
-
-Pavan Sri Sai Mondem
+👨‍💻 Credits:
 
 Siva Satyamsetti
-
-Uma Satyam Mounika Sapireddy
-
-Bhuvaneswari Devi Seru
-
-Chandu Meela
