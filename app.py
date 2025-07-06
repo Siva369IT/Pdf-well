@@ -343,7 +343,7 @@ elif operation == "Remove Uploaded Files":
 
 st.markdown(
 """<div style="position: fixed; bottom: 45px; width: 100%; text-align: center; font-size: small; color: #2F4F4F;">
-© 2025 Pavan SriSai Mondem | Siva Satyamsetti | Uma Satya Mounika Sapireddy | Bhuvaneswari Devi Seru | Chandu Meela | Trainees from techwing 🧡 | Made with 💚 by gen ai and aws trainees
+© 2025 | All rights reserved! | Siva Satyamsetti | Made with 💚 by shivaji
 
    </div>""",  
     unsafe_allow_html=True  
